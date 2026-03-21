@@ -1,0 +1,1793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BuildTrack — Construction Management</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0f1117;--ink2:#374151;--ink3:#6b7280;--ink4:#9ca3af;
+  --paper:#ffffff;--paper2:#f9fafb;--paper3:#f3f4f6;--paper4:#e5e7eb;
+  --accent:#1a6b4a;--accent-light:#e8f5ee;--accent-mid:#2d9068;
+  --amber:#92400e;--amber-light:#fffbeb;--amber-mid:#d97706;
+  --red:#991b1b;--red-light:#fef2f2;--red-mid:#dc2626;
+  --blue:#1e3a5f;--blue-light:#eff6ff;--blue-mid:#2563eb;
+  --r:6px;--rl:10px;--sh:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+  --shm:0 4px 6px rgba(0,0,0,.06),0 2px 4px rgba(0,0,0,.04);
+  --bd:1px solid #e5e7eb;
+}
+html{font-size:14px}
+body{font-family:'Instrument Sans',sans-serif;background:var(--paper2);color:var(--ink);line-height:1.5;min-height:100vh}
+button,select{font-family:inherit;cursor:pointer}
+
+/* NAV */
+.gnav{display:flex;align-items:center;height:52px;background:var(--paper);border-bottom:var(--bd);position:sticky;top:0;z-index:300;padding:0 20px;gap:0}
+.glogo{display:flex;align-items:center;gap:9px;padding-right:20px;border-right:var(--bd);margin-right:2px}
+.glogo-mark{width:28px;height:28px;background:var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-size:15px;color:#fff;font-style:italic}
+.glogo-name{font-size:14px;font-weight:600;color:var(--ink);letter-spacing:-.01em}
+.gtabs{display:flex;height:52px}
+.gtab{display:flex;align-items:center;gap:6px;padding:0 16px;font-size:13px;font-weight:500;color:var(--ink3);border:none;background:none;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;height:52px}
+.gtab:hover{color:var(--ink);background:var(--paper2)}
+.gtab.active{color:var(--accent);border-bottom-color:var(--accent);background:var(--accent-light)}
+.gspacer{flex:1}
+.gmeta{display:flex;align-items:center;gap:8px;padding-left:16px;border-left:var(--bd);font-size:12px;color:var(--ink3)}
+.gav{width:28px;height:28px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+
+/* PAGE */
+.page{display:none;min-height:calc(100vh - 52px)}
+.page.active{display:block}
+
+/* SIDEBAR + LAYOUT */
+.lshell{display:flex;min-height:calc(100vh - 52px)}
+.lsb{width:210px;min-width:210px;background:var(--paper);border-right:var(--bd);padding:12px 0;display:flex;flex-direction:column;gap:1px;position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto}
+.lmain{flex:1;overflow-y:auto;min-width:0}
+.sg{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink4);padding:10px 16px 4px}
+.si{display:flex;align-items:center;gap:8px;padding:8px 16px;font-size:13px;font-weight:500;color:var(--ink2);border:none;background:none;border-left:2px solid transparent;transition:all .12s;width:100%;text-align:left}
+.si:hover{background:var(--paper2);color:var(--ink)}
+.si.active{background:var(--accent-light);color:var(--accent);border-left-color:var(--accent)}
+.si-ic{width:18px;text-align:center;font-size:14px;flex-shrink:0}
+.si-ct{margin-left:auto;font-size:10px;font-weight:600;background:var(--accent);color:#fff;padding:1px 5px;border-radius:10px}
+
+/* PAGE HEAD */
+.pgh{display:flex;align-items:flex-start;justify-content:space-between;padding:20px 24px 16px;background:var(--paper);border-bottom:var(--bd)}
+.pgh h1{font-size:17px;font-weight:600;color:var(--ink);letter-spacing:-.02em}
+.pgh p{font-size:12px;color:var(--ink3);margin-top:2px}
+.pgh-r{display:flex;align-items:center;gap:7px}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:var(--r);font-size:13px;font-weight:500;border:none;transition:all .12s;white-space:nowrap}
+.btn-p{background:var(--accent);color:#fff}.btn-p:hover{background:var(--accent-mid)}
+.btn-g{background:var(--paper);color:var(--ink2);border:var(--bd)}.btn-g:hover{background:var(--paper2)}
+.btn-sm{padding:5px 10px;font-size:12px}
+.sel{background:var(--paper);border:var(--bd);border-radius:var(--r);padding:5px 9px;font-size:12px;color:var(--ink2)}
+
+/* STAT CARDS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:18px 24px}
+.sbox{background:var(--paper);border:var(--bd);border-radius:var(--rl);padding:16px 16px 12px;box-shadow:var(--sh)}
+.slb{font-size:10px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.05em}
+.sv{font-family:'Instrument Serif',serif;font-size:26px;color:var(--ink);line-height:1.1;margin:5px 0 2px;letter-spacing:-.02em}
+.ss{font-size:11px;color:var(--ink3)}.ss.up{color:var(--accent-mid)}.ss.dn{color:var(--red-mid)}
+.sbar{height:2px;background:var(--paper3);border-radius:2px;margin-top:10px}
+.sfill{height:100%;border-radius:2px}
+
+/* TABLE */
+.twrap{overflow-x:auto}
+table.dt{width:100%;border-collapse:collapse}
+.dt th{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--ink3);padding:9px 14px;background:var(--paper2);border-bottom:var(--bd);border-top:var(--bd);text-align:left;white-space:nowrap}
+.dt td{padding:11px 14px;font-size:13px;color:var(--ink2);border-bottom:1px solid var(--paper3);vertical-align:middle}
+.dt tr:hover td{background:var(--paper2)}
+.dt .nc{font-weight:500;color:var(--ink)}.dt .mn{font-family:'JetBrains Mono',monospace;font-size:12px}
+
+/* BADGES */
+.bdg{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:500;padding:2px 7px;border-radius:20px}
+.bdg-g{background:var(--accent-light);color:var(--accent)}
+.bdg-a{background:var(--amber-light);color:var(--amber-mid)}
+.bdg-r{background:var(--red-light);color:var(--red-mid)}
+.bdg-b{background:var(--blue-light);color:var(--blue-mid)}
+.bdg-n{background:var(--paper3);color:var(--ink3)}
+.bdg-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+
+/* CARD */
+.card{background:var(--paper);border:var(--bd);border-radius:var(--rl);box-shadow:var(--sh)}
+.chead{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:var(--bd)}
+.chead h3{font-size:13px;font-weight:600;color:var(--ink)}
+.chr{display:flex;align-items:center;gap:7px}
+
+/* LAYOUT */
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 24px 20px}
+.fullcol{padding:0 24px 20px}
+.sublabel{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink4);padding:12px 0 7px}
+
+/* EXP ROW */
+.erow{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--paper3);transition:background .1s}
+.erow:last-child{border-bottom:none}.erow:hover{background:var(--paper2)}
+.epip{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.einf{flex:1;min-width:0}
+.evn{font-size:13px;font-weight:500;color:var(--ink)}
+.emeta{font-size:11px;color:var(--ink3);margin-top:1px}
+.eamt{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:500;color:var(--ink);text-align:right}
+
+/* CAT BAR */
+.catlist{padding:10px 16px;display:flex;flex-direction:column;gap:9px}
+.catrow{display:flex;flex-direction:column;gap:3px}
+.catr-top{display:flex;justify-content:space-between;align-items:center}
+.catnm{font-size:12px;color:var(--ink2)}
+.catamt{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500}
+.cattrk{height:4px;background:var(--paper3);border-radius:2px;overflow:hidden}
+.catfill{height:100%;border-radius:2px;transition:width 1.2s ease}
+
+/* CHAT */
+.crow{display:flex;align-items:center;gap:9px;padding:10px 14px;border-bottom:1px solid var(--paper3);cursor:pointer;transition:background .1s}
+.crow:hover{background:var(--paper2)}
+.cav{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.cnm{font-size:13px;font-weight:500;color:var(--ink)}
+.cprev{font-size:11px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.ctime{font-size:10px;color:var(--ink4);text-align:right}
+.unrd{display:inline-block;background:var(--accent);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:10px;margin-top:3px}
+
+/* ══ DEMO PAGE ══════════════════════════ */
+.dshell{display:flex;min-height:calc(100vh - 52px)}
+.dleft{width:250px;min-width:250px;background:var(--paper);border-right:var(--bd);display:flex;flex-direction:column;padding:12px 0}
+.dcenter{flex:1;display:flex;flex-direction:column;align-items:center;padding:24px 16px;gap:18px;background:var(--paper2)}
+.dright{width:260px;min-width:260px;background:var(--paper);border-left:var(--bd);padding:18px;display:flex;flex-direction:column;gap:12px;overflow-y:auto}
+
+.scbtn{display:flex;align-items:flex-start;gap:9px;padding:9px 14px;border:none;background:none;text-align:left;color:var(--ink2);border-left:2px solid transparent;transition:all .12s;width:100%;cursor:pointer}
+.scbtn:hover{background:var(--paper2)}
+.scbtn.active{background:var(--accent-light);border-left-color:var(--accent)}
+.scbtn-ic{width:30px;height:30px;border-radius:6px;background:var(--paper3);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.scbtn.active .scbtn-ic{background:var(--accent-light);border:1px solid #b6dfc8}
+.scbtn-ti{font-size:12px;font-weight:600;color:var(--ink);line-height:1.3}
+.scbtn.active .scbtn-ti{color:var(--accent)}
+.scbtn-ds{font-size:11px;color:var(--ink3);margin-top:2px;line-height:1.4}
+
+.schead{text-align:center;max-width:400px}
+.scpill{display:inline-block;background:var(--accent-light);color:var(--accent);font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:20px;border:1px solid #b6dfc8;margin-bottom:9px}
+.schead h2{font-size:19px;font-weight:600;color:var(--ink);letter-spacing:-.02em;margin-bottom:5px;line-height:1.2}
+.schead p{font-size:12px;color:var(--ink3);line-height:1.55}
+
+/* PHONE */
+.pframe{width:290px;flex-shrink:0;background:#cbd5e1;border-radius:36px;padding:8px;box-shadow:0 20px 50px rgba(0,0,0,.16),0 0 0 1px rgba(0,0,0,.08)}
+.pinner{background:#ece5dd;border-radius:30px;overflow:hidden;height:550px;display:flex;flex-direction:column;position:relative}
+.pnotch{position:absolute;top:7px;left:50%;transform:translateX(-50%);width:68px;height:20px;background:#1a1a1a;border-radius:10px;z-index:10}
+
+/* WA */
+.wabar{background:#075e54;padding:30px 11px 9px;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.waav{width:33px;height:33px;border-radius:50%;background:#128c7e;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;font-weight:700;flex-shrink:0}
+.wanm{font-size:13px;font-weight:600;color:#fff;line-height:1.2}
+.wast{font-size:10px;color:rgba(255,255,255,.6)}
+.waic{display:flex;gap:11px;margin-left:auto}
+.wai{color:rgba(255,255,255,.8);font-size:15px}
+.wamsgs{flex:1;overflow-y:auto;padding:7px 7px 5px;display:flex;flex-direction:column;gap:3px;scroll-behavior:smooth}
+.wamsgs::-webkit-scrollbar{width:0}
+.dtdiv{text-align:center;margin:4px 0}
+.dtdiv span{background:rgba(255,255,255,.8);color:#6b7280;font-size:10px;padding:2px 8px;border-radius:6px}
+.msg{display:flex;flex-direction:column;max-width:84%;opacity:0}
+.msg.in{align-self:flex-start}.msg.out{align-self:flex-end}
+@keyframes pop{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.msg.vis{animation:pop .2s ease forwards}
+.bbl{padding:6px 8px 4px;border-radius:7px;font-size:11px;line-height:1.45;white-space:pre-wrap;word-break:break-word}
+.msg.in .bbl{background:#fff;color:#111;border-top-left-radius:2px;box-shadow:0 1px 2px rgba(0,0,0,.07)}
+.msg.out .bbl{background:#dcf8c6;color:#111;border-top-right-radius:2px;box-shadow:0 1px 2px rgba(0,0,0,.07)}
+.msgt{font-size:9px;color:#9ca3af;margin-top:2px;padding:0 3px;align-self:flex-end;display:flex;align-items:center;gap:2px}
+.tck{color:#53bdeb;font-size:10px}
+.typbl{display:flex;align-items:center;gap:3px;padding:8px 10px;background:#fff;border-radius:7px;border-top-left-radius:2px;width:46px;align-self:flex-start;box-shadow:0 1px 2px rgba(0,0,0,.07);opacity:0;transition:opacity .2s}
+.typbl.vis{opacity:1}
+.td{width:5px;height:5px;background:#9ca3af;border-radius:50%;animation:tb 1.2s infinite}
+.td:nth-child(2){animation-delay:.2s}.td:nth-child(3){animation-delay:.4s}
+@keyframes tb{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-4px)}}
+.wabot{background:#f0f2f5;padding:5px 8px;display:flex;align-items:center;gap:6px;flex-shrink:0}
+.wainp{flex:1;background:#fff;border-radius:20px;padding:7px 10px;font-size:10px;color:#555;border:none;pointer-events:none}
+.wasend{width:32px;height:32px;background:#075e54;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;flex-shrink:0}
+
+/* Special bubbles */
+.lnk-bbl{background:#fff;border-radius:7px;border-top-left-radius:2px;box-shadow:0 1px 2px rgba(0,0,0,.07);overflow:hidden;min-width:190px}
+.lnk-prev{height:60px;background:linear-gradient(135deg,#1a6b4a,#2d9068);display:flex;align-items:center;justify-content:center;font-size:24px}
+.lnk-body{padding:7px 9px 6px}
+.lnk-site{font-size:9px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.04em}
+.lnk-title{font-size:11px;font-weight:600;color:#111;line-height:1.3;margin-top:1px}
+.lnk-url{font-size:9px;color:#6b7280;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.pay-bbl{background:#fff;border-radius:7px;border-top-left-radius:2px;box-shadow:0 1px 2px rgba(0,0,0,.07);overflow:hidden;min-width:195px}
+.pay-hd{background:#0f2f1f;padding:9px 11px;display:flex;align-items:center;gap:7px}
+.pay-hd-ic{font-size:16px}.pay-hd-tx{font-size:11px;font-weight:600;color:#fff}
+.pay-bd{padding:9px 11px 6px}
+.pay-am{font-family:'JetBrains Mono',monospace;font-size:19px;font-weight:500;color:#111}
+.pay-ds{font-size:10px;color:#6b7280;margin-top:2px;line-height:1.4}
+.pay-btn-el{display:block;background:var(--accent);color:#fff;text-align:center;padding:7px;font-size:11px;font-weight:600;margin:8px 11px;border-radius:5px;border:none;width:calc(100% - 22px)}
+.pay-due{font-size:10px;color:#dc2626;text-align:center;padding-bottom:8px;font-weight:500}
+
+.doc-bbl{display:flex;align-items:center;gap:8px;padding:7px 9px;background:#dcf8c6;border-radius:7px;border-top-right-radius:2px;box-shadow:0 1px 2px rgba(0,0,0,.07);min-width:170px}
+.doc-ic{width:30px;height:30px;background:#dc2626;border-radius:5px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;flex-shrink:0}
+.doc-nm{font-size:11px;font-weight:600;color:#111}.doc-sz{font-size:9px;color:#6b7280}
+.voi-bbl{display:flex;align-items:center;gap:6px;padding:6px 8px;background:#dcf8c6;border-radius:7px;border-top-right-radius:2px;box-shadow:0 1px 2px rgba(0,0,0,.07);min-width:160px}
+.vplay{width:26px;height:26px;background:#075e54;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;flex-shrink:0}
+.vwave{flex:1;display:flex;align-items:center;gap:1.5px;height:20px}
+.vbar{width:2px;background:#075e54;border-radius:2px;opacity:.4;flex-shrink:0}
+.vdur{font-size:9px;color:#6b7280}
+
+/* CONTROLS */
+.dctrl{display:flex;align-items:center;gap:9px;background:var(--paper);border:var(--bd);border-radius:var(--rl);padding:9px 13px;width:100%;max-width:350px;box-shadow:var(--sh)}
+.cbtn{width:30px;height:30px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .15s;flex-shrink:0}
+.cplay{background:var(--accent);color:#fff}.cplay:hover{background:var(--accent-mid)}
+.cnav{background:var(--paper2);color:var(--ink3);border:var(--bd)}.cnav:hover{background:var(--paper3)}
+.ctrk{flex:1;height:2px;background:var(--paper3);border-radius:2px;overflow:hidden}
+.cfill{height:100%;background:var(--accent);width:0%;transition:width .3s linear}
+.clbl{font-size:11px;color:var(--ink3);min-width:34px;text-align:right}
+
+/* INSIGHT CARDS */
+.icard{background:var(--paper);border:var(--bd);border-radius:var(--rl);padding:13px;opacity:.25;transition:opacity .4s,border-color .4s}
+.icard.lit{opacity:1;border-color:#b6dfc8;background:var(--accent-light)}
+.icard-ic{font-size:17px;margin-bottom:6px}
+.icard-ti{font-size:12px;font-weight:600;color:var(--ink);margin-bottom:3px}
+.icard-bd{font-size:11px;color:var(--ink3);line-height:1.55}
+.icard.lit .icard-bd{color:var(--accent)}
+
+/* ══ CLIENT DASHBOARD ═══════════════════ */
+.chero{background:linear-gradient(to right,#0f2f1f,#1a5238);padding:24px 28px 20px}
+.chero h1{font-family:'Instrument Serif',serif;font-size:24px;color:#fff;font-style:italic;letter-spacing:-.01em}
+.chero-sub{font-size:12px;color:rgba(255,255,255,.5);margin-top:3px}
+.chero-meta{display:flex;align-items:center;gap:10px;margin-top:14px;flex-wrap:wrap}
+.cmi{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.1);border-radius:5px;padding:5px 10px;font-size:11px;color:rgba(255,255,255,.75)}
+.cprog{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.15);border-radius:5px;padding:5px 12px;font-size:12px;font-weight:600;color:#fff}
+.cbody{display:grid;grid-template-columns:1fr 320px;min-height:calc(100vh - 52px - 140px)}
+.cleft{padding:22px 24px;border-right:var(--bd);overflow-y:auto}
+.cright{padding:18px 20px;background:var(--paper2);overflow-y:auto}
+
+/* TIMELINE */
+.tl{display:flex;flex-direction:column}
+.tli{display:flex;gap:13px;position:relative}
+.tli:not(:last-child)::before{content:'';position:absolute;left:14px;top:32px;bottom:0;width:1px;background:var(--paper4);z-index:0}
+.tli.done:not(:last-child)::before{background:#b6dfc8}
+.tldot{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;z-index:1;border:1px solid var(--paper4);background:var(--paper)}
+.tli.done .tldot{background:var(--accent-light);border-color:#b6dfc8;color:var(--accent)}
+.tli.current .tldot{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 0 0 4px #c8ebd8}
+.tli.upcoming .tldot{background:var(--paper2);color:var(--ink4)}
+.tlbd{flex:1;padding-bottom:20px;padding-top:3px}
+.tltitle{font-size:13px;font-weight:600;color:var(--ink)}
+.tli.upcoming .tltitle{color:var(--ink3)}
+.tldate{font-size:11px;color:var(--ink3);margin-top:1px}
+.tlnote{font-size:12px;color:var(--ink2);line-height:1.55;margin-top:6px;background:var(--paper2);border:var(--bd);border-radius:6px;padding:8px 11px}
+.tli.upcoming .tlnote{opacity:.45}
+.tlbar{height:3px;background:var(--paper3);border-radius:2px;margin-top:7px;overflow:hidden}
+.tlbarfill{height:100%;background:var(--accent);border-radius:2px;transition:width 1.2s}
+.tlchips{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.tlchip{font-size:10px;padding:2px 6px;border-radius:10px;background:var(--paper3);color:var(--ink3);border:var(--bd)}
+.tli.done .tlchip,.tli.current .tlchip{background:var(--accent-light);color:var(--accent);border-color:#b6dfc8}
+
+/* DOC CARD */
+.doclist{display:flex;flex-direction:column;gap:5px}
+.doccard{display:flex;align-items:center;gap:9px;background:var(--paper);border:var(--bd);border-radius:var(--r);padding:9px 11px;cursor:pointer;transition:all .12s}
+.doccard:hover{border-color:var(--paper4);box-shadow:var(--sh)}
+.dcic{width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.dc-pdf{background:#fef2f2;border:1px solid #fecaca}
+.dc-img{background:var(--accent-light);border:1px solid #b6dfc8}
+.dc-cad{background:var(--blue-light);border:1px solid #bfdbfe}
+.dcinf{flex:1;min-width:0}
+.dcnm{font-size:12px;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dcmeta{font-size:10px;color:var(--ink3);margin-top:1px}
+
+/* PHOTOS */
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.ptile{aspect-ratio:1;border-radius:6px;overflow:hidden;border:var(--bd);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;transition:transform .15s;position:relative}
+.ptile:hover{transform:scale(1.02)}
+.ptlbl{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.4);color:#fff;font-size:9px;padding:3px 5px}
+.pt1{background:#f3e8d4}.pt2{background:#d1ead8}.pt3{background:#dbeafe}
+.pt4{background:#ede9fe}.pt5{background:#d1fae5}.pt6{background:#fee2e2}
+
+/* PAY LINE */
+.payline{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--paper3)}
+.payline:last-child{border-bottom:none}
+.pldesc{font-size:12px;font-weight:500;color:var(--ink)}
+.pldate{font-size:10px;color:var(--ink3);margin-top:1px}
+.plamt{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:500;text-align:right}
+
+/* RESPONSIVE */
+@media(max-width:1100px){.dright,.cright{display:none}.stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:800px){.dleft,.lsb{display:none}.twocol{grid-template-columns:1fr}.cbody{grid-template-columns:1fr}}
+
+/* ══ AI LEAD GEN PAGE ══════════════════════════════════════ */
+#page-leadgen{background:var(--paper2);min-height:calc(100vh - 52px);display:none}
+#page-leadgen.active{display:flex;flex-direction:column;height:calc(100vh - 52px)}
+
+/* Sub-nav for scenario switching */
+.lg-subnav{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;height:48px;background:var(--paper);
+  border-bottom:var(--bd);flex-shrink:0;
+}
+.lg-subnav-left{display:flex;align-items:center;gap:6px}
+.lg-subtab{
+  display:flex;align-items:center;gap:6px;padding:6px 16px;
+  border-radius:var(--r);font-size:12px;font-weight:600;
+  border:var(--bd);cursor:pointer;transition:all .14s;
+  background:var(--paper);color:var(--ink3);
+  font-family:'Instrument Sans',sans-serif;
+}
+.lg-subtab:hover{background:var(--paper2);color:var(--ink)}
+.lg-subtab.active{background:var(--accent-light);color:var(--accent);border-color:transparent}
+.lg-subtab .st-dot{width:7px;height:7px;border-radius:50%;background:currentColor;animation:lgp 2s infinite}
+@keyframes lgp{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* Scenario body */
+.lg-body{flex:1;display:flex;overflow:hidden;position:relative}
+.lg-scenario{position:absolute;inset:0;display:none;flex-direction:column}
+.lg-scenario.active{display:flex}
+.sc-content-row{flex:1;display:flex;overflow:hidden}
+
+/* ── SHARED SCENARIO LAYOUT ── */
+.sc-left{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  padding:20px 24px;border-right:var(--bd);
+  background:var(--paper2);overflow:auto;
+}
+.sc-right{
+  width:260px;min-width:260px;background:var(--paper);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.sc-right-head{
+  padding:14px 18px 12px;border-bottom:var(--bd);flex-shrink:0;
+}
+.sc-right-label{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3)}
+.sc-right-title{font-size:13px;font-weight:600;color:var(--ink);margin-top:2px}
+.sc-right-body{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
+.sc-right-body::-webkit-scrollbar{width:3px}
+.sc-right-body::-webkit-scrollbar-thumb{background:var(--paper4);border-radius:2px}
+
+/* ── PLAY BUTTON STRIP ── */
+.sc-play-strip{
+  padding:10px 14px;border-top:var(--bd);background:var(--paper2);flex-shrink:0;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+}
+.sc-play-meta{font-size:11px;color:var(--ink3)}
+.sc-play-meta span{color:var(--ink);font-weight:600}
+
+/* ── LAPTOP MOCKUP ── */
+.laptop-wrap{width:420px;flex-shrink:0;display:flex;flex-direction:column}
+.laptop-shell{
+  background:#e2e8f0;border-radius:12px 12px 0 0;padding:9px 9px 0;
+  box-shadow:0 0 0 1px #cbd5e1,0 16px 48px rgba(0,0,0,.2);
+}
+.lt-bar{display:flex;align-items:center;gap:5px;padding-bottom:8px}
+.lt-dot{width:8px;height:8px;border-radius:50%}
+.lt-d1{background:#ff5f57}.lt-d2{background:#ffbd2e}.lt-d3{background:#28c840}
+.lt-url{flex:1;background:#f1f5f9;border-radius:5px;padding:3px 10px;display:flex;align-items:center;gap:5px}
+.lt-url-txt{font-size:9.5px;color:#64748b;font-family:'JetBrains Mono',monospace}
+.lt-viewport{height:340px;background:#f8f8f6;border-radius:4px 4px 0 0;position:relative;overflow:hidden}
+.laptop-base{height:12px;background:#cbd5e1;border-radius:0 0 3px 3px}
+.laptop-stand{width:100%;display:flex;justify-content:center}
+.laptop-stand-body{width:100px;height:8px;background:#b8c2cc;border-radius:0 0 6px 6px}
+.laptop-foot{width:140px;height:3px;background:#a8b2bb;border-radius:2px;margin:0 auto}
+
+/* Site inside laptop */
+.site-chrome{background:#fff;border-bottom:1px solid #e5e7eb;padding:7px 12px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.site-logo-sm{font-size:10px;font-weight:700;color:#111}
+.site-nav-sm{display:flex;gap:12px}
+.site-nav-sm span{font-size:8.5px;color:#6b7280}
+.site-hero-sm{background:linear-gradient(135deg,#0f172a,#1e3a5f);padding:18px 14px;text-align:center}
+.site-hero-sm h2{font-size:13px;font-weight:700;color:#fff;margin-bottom:4px;line-height:1.3}
+.site-hero-sm p{font-size:8px;color:rgba(255,255,255,.5);margin-bottom:10px;line-height:1.5}
+.site-cta-sm{display:inline-block;background:var(--accent);color:#fff;font-size:8.5px;font-weight:700;padding:5px 13px;border-radius:14px;border:none;cursor:pointer}
+.site-cards-sm{display:flex;gap:6px;padding:10px 12px;background:#f9fafb}
+.site-card-sm{flex:1;background:#fff;border:1px solid #e5e7eb;border-radius:6px;padding:8px;text-align:center}
+.site-card-ic-sm{font-size:13px;margin-bottom:3px}
+.site-card-t-sm{font-size:8.5px;font-weight:600;color:#111}
+
+/* Chat widget inside laptop */
+.chat-fab-wrap{position:absolute;bottom:10px;right:10px;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.chat-hint-bbl{
+  background:var(--accent);color:#fff;font-size:8.5px;font-weight:600;
+  padding:4px 10px;border-radius:10px;border-bottom-right-radius:2px;
+  box-shadow:0 2px 8px rgba(26,107,74,.3);opacity:0;transition:opacity .3s;white-space:nowrap;
+}
+.chat-hint-bbl.show{opacity:1}
+.chat-fab-btn{
+  width:38px;height:38px;border-radius:50%;background:var(--accent);
+  display:flex;align-items:center;justify-content:center;font-size:17px;
+  box-shadow:0 3px 12px rgba(26,107,74,.35);position:relative;cursor:pointer;
+}
+.chat-fab-ring{position:absolute;inset:-4px;border-radius:50%;border:2px solid rgba(26,107,74,.35);animation:fabring 2s infinite}
+@keyframes fabring{0%{transform:scale(1);opacity:1}100%{transform:scale(1.6);opacity:0}}
+
+/* Chat window inside laptop */
+.web-chatwin{
+  position:absolute;bottom:50px;right:10px;width:210px;
+  background:#fff;border-radius:12px;border-bottom-right-radius:3px;
+  box-shadow:0 8px 32px rgba(0,0,0,.16);overflow:hidden;
+  display:flex;flex-direction:column;max-height:270px;
+  transform:scale(.85) translateY(12px);opacity:0;transform-origin:bottom right;
+  transition:transform .28s cubic-bezier(.34,1.4,.64,1),opacity .18s;
+}
+.web-chatwin.open{transform:scale(1) translateY(0);opacity:1}
+.wch-head{background:var(--accent);padding:9px 12px;flex-shrink:0}
+.wch-head-nm{font-size:10.5px;font-weight:700;color:#fff}
+.wch-head-sub{font-size:8.5px;color:rgba(255,255,255,.7);margin-top:1px}
+.wch-msgs{flex:1;overflow-y:auto;padding:7px;background:#f0f0f0;display:flex;flex-direction:column;gap:3px}
+.wch-msgs::-webkit-scrollbar{width:0}
+.wch-bbl{font-size:9px;line-height:1.45;padding:5px 7px;border-radius:7px;max-width:92%;word-break:break-word;white-space:pre-wrap}
+.wch-in{background:#fff;color:#111;border-bottom-left-radius:2px;align-self:flex-start;box-shadow:0 1px 2px rgba(0,0,0,.07)}
+.wch-out{background:#dcf8c6;color:#111;border-bottom-right-radius:2px;align-self:flex-end}
+.wch-typing{display:flex;align-items:center;gap:3px;padding:6px 7px;background:#fff;border-radius:7px;border-bottom-left-radius:2px;width:38px;align-self:flex-start;opacity:0;transition:opacity .2s;box-shadow:0 1px 2px rgba(0,0,0,.07)}
+.wch-typing.show{opacity:1}
+.wch-td{width:4px;height:4px;border-radius:50%;background:#9ca3af;animation:wcht 1.2s infinite}
+.wch-td:nth-child(2){animation-delay:.2s}.wch-td:nth-child(3){animation-delay:.4s}
+@keyframes wcht{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-3px)}}
+.wch-input-bar{background:#fff;border-top:1px solid #e5e7eb;padding:5px 7px;display:flex;gap:5px;flex-shrink:0}
+.wch-inp{flex:1;background:#f3f4f6;border-radius:10px;padding:4px 8px;font-size:8.5px;color:#aaa;border:none;font-family:inherit}
+.wch-send{width:22px;height:22px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;flex-shrink:0}
+
+/* ── INSTAGRAM → WHATSAPP LAYOUT ── */
+.ig-wa-wrap{display:flex;align-items:center;gap:20px;flex-shrink:0}
+
+/* Instagram phone */
+.ig-ph{
+  width:170px;background:#1a1b2a;border-radius:28px;padding:7px;
+  box-shadow:0 16px 48px rgba(0,0,0,.25),0 0 0 1px rgba(255,255,255,.07);
+  flex-shrink:0;
+}
+.ig-scr{background:#000;border-radius:21px;overflow:hidden;height:340px;display:flex;flex-direction:column;position:relative}
+.ig-notch-sm{position:absolute;top:6px;left:50%;transform:translateX(-50%);width:48px;height:13px;background:#1a1b2a;border-radius:7px;z-index:10}
+.ig-top{background:#000;padding:20px 9px 5px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.ig-brand{font-size:13px;font-weight:700;color:#fff;font-style:italic;font-family:'Instrument Serif',serif}
+.ig-top-icons{display:flex;gap:9px;font-size:12px;color:rgba(255,255,255,.75)}
+.ig-stories-row{display:flex;gap:7px;padding:6px 9px;border-bottom:1px solid rgba(255,255,255,.05);flex-shrink:0}
+.ig-st{display:flex;flex-direction:column;align-items:center;gap:2px}
+.ig-st-ring{width:32px;height:32px;border-radius:50%;background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366);padding:2px}
+.ig-st-av{width:100%;height:100%;border-radius:50%;background:#1a1b2a;display:flex;align-items:center;justify-content:center;font-size:12px;border:1.5px solid #000}
+.ig-st-nm{font-size:6.5px;color:rgba(255,255,255,.5)}
+.ig-post-wrap{flex:1;overflow:hidden;display:flex;flex-direction:column}
+.ig-ad-img{
+  height:120px;background:linear-gradient(135deg,#1e3a5f,#1a4a30,#2d1b69);
+  position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;
+  flex-shrink:0;
+}
+.ig-ad-img::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 35% 60%,rgba(26,107,74,.3),transparent 55%)}
+.ig-sponsored{position:absolute;top:5px;left:7px;background:rgba(139,92,246,.85);color:#fff;font-size:6.5px;font-weight:700;padding:2px 6px;border-radius:3px;z-index:2}
+.ig-post-body{padding:7px 9px;flex:1}
+.ig-post-user{display:flex;align-items:center;gap:5px;margin-bottom:4px}
+.ig-post-av{width:18px;height:18px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;flex-shrink:0}
+.ig-post-nm{font-size:8.5px;font-weight:700;color:#fff}
+.ig-post-type{font-size:7px;color:rgba(255,255,255,.35);margin-left:2px}
+.ig-caption{font-size:7.5px;color:rgba(255,255,255,.75);line-height:1.45;margin-bottom:6px}
+.ig-cta{width:100%;background:var(--accent);color:#fff;font-size:8.5px;font-weight:700;padding:6px;border-radius:5px;border:none;cursor:pointer;transition:all .15s;font-family:'Instrument Sans',sans-serif}
+.ig-cta:hover{background:var(--accent-mid)}
+.ig-post-note{font-size:6.5px;color:rgba(255,255,255,.25);text-align:center;margin-top:3px}
+
+/* Arrow connector */
+.sc-arrow{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;opacity:0;transition:opacity .4s}
+.sc-arrow.show{opacity:1}
+.sc-arrow-line{width:32px;height:1px;background:linear-gradient(to right,#8b5cf6,var(--accent))}
+.sc-arrow-tip{font-size:12px;color:var(--accent)}
+.sc-arrow-label{font-size:8.5px;color:var(--ink3);text-align:center;line-height:1.4;white-space:nowrap}
+
+/* WhatsApp phone (shared style) */
+.wa-ph{
+  width:180px;background:#e2e8f0;border-radius:28px;padding:7px;
+  box-shadow:0 16px 48px rgba(0,0,0,.2),0 0 0 1px #cbd5e1;
+  flex-shrink:0;
+}
+.wa-ph-scr{
+  background:#ece5dd;border-radius:21px;overflow:hidden;
+  height:340px;display:flex;flex-direction:column;position:relative;
+}
+.wa-ph-notch{position:absolute;top:6px;left:50%;transform:translateX(-50%);width:52px;height:14px;background:#e2e8f0;border-radius:8px;z-index:10}
+.wa-ph-bar{background:#075e54;padding:24px 10px 8px;display:flex;align-items:center;gap:7px;flex-shrink:0}
+.wa-ph-av{width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.wa-ph-nm{font-size:11px;font-weight:700;color:#fff}
+.wa-ph-sub{font-size:8.5px;color:rgba(255,255,255,.55)}
+.wa-ph-icons{margin-left:auto;display:flex;gap:10px;font-size:12px;color:rgba(255,255,255,.7)}
+.wa-ph-msgs{flex:1;padding:7px;overflow-y:auto;display:flex;flex-direction:column;gap:3px;scroll-behavior:smooth}
+.wa-ph-msgs::-webkit-scrollbar{width:0}
+.wa-m-wrap{display:flex;flex-direction:column;max-width:88%;opacity:0}
+.wa-m-wrap.out{align-self:flex-end}
+.wa-m-wrap.in{align-self:flex-start}
+@keyframes wampop{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.wa-m-wrap.vis{animation:wampop .2s ease forwards}
+.wa-m-bbl{font-size:9.5px;line-height:1.45;padding:5px 7px 4px;border-radius:7px;word-break:break-word;white-space:pre-wrap}
+.wa-m-wrap.in .wa-m-bbl{background:#fff;color:#111;border-top-left-radius:2px;box-shadow:0 1px 2px rgba(0,0,0,.07)}
+.wa-m-wrap.out .wa-m-bbl{background:#dcf8c6;color:#111;border-top-right-radius:2px;box-shadow:0 1px 2px rgba(0,0,0,.07)}
+.wa-m-ts{font-size:8.5px;color:#9ca3af;margin-top:1px;padding:0 2px;align-self:flex-end;display:flex;align-items:center;gap:2px}
+.wa-m-tck{color:#53bdeb;font-size:9px}
+.wa-ph-typing{display:flex;align-items:center;gap:3px;padding:7px 9px;background:#fff;border-radius:7px;border-top-left-radius:2px;width:42px;align-self:flex-start;opacity:0;transition:opacity .2s;box-shadow:0 1px 2px rgba(0,0,0,.07)}
+.wa-ph-typing.vis{opacity:1}
+.wa-ph-td{width:5px;height:5px;border-radius:50%;background:#9ca3af;animation:waptd 1.2s infinite}
+.wa-ph-td:nth-child(2){animation-delay:.2s}.wa-ph-td:nth-child(3){animation-delay:.4s}
+@keyframes waptd{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-3px)}}
+.wa-ph-bot{background:#f0f2f5;padding:5px 8px;display:flex;gap:5px;align-items:center;flex-shrink:0}
+.wa-ph-inp{flex:1;background:#fff;border-radius:16px;padding:5px 9px;font-size:8.5px;color:#aaa;border:none;font-family:inherit}
+.wa-ph-send{width:28px;height:28px;background:#128c7e;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;flex-shrink:0}
+
+/* Render inside WA */
+.wa-render-wrap{align-self:flex-start;max-width:88%;border-radius:8px;border-top-left-radius:2px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.1);opacity:0}
+.wa-render-wrap.vis{animation:wampop .2s ease forwards}
+.wa-render-img{
+  width:155px;height:88px;
+  background:linear-gradient(135deg,#1e3a5f,#1a4a30,#2d1b69);
+  display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;
+}
+.wa-render-img::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 35%,rgba(0,0,0,.35))}
+.wa-render-tag{position:absolute;top:5px;left:6px;background:rgba(26,107,74,.85);color:#fff;font-size:7px;font-weight:700;padding:1px 6px;border-radius:3px;z-index:1}
+.wa-render-txt{background:#fff;padding:5px 7px;font-size:9px;color:#111;line-height:1.45;width:155px}
+
+/* ── OUTPUT CARDS (right panel) ── */
+.out-card{
+  background:var(--paper);border:var(--bd);border-radius:var(--rl);
+  overflow:hidden;box-shadow:var(--sh);
+  opacity:0;transform:translateY(8px);transition:opacity .35s,transform .35s;
+}
+.out-card.show{opacity:1;transform:translateY(0)}
+
+/* Cost sheet */
+.cost-head{background:linear-gradient(135deg,#0f172a,#1e3a5f);padding:11px 14px}
+.cost-head-title{font-size:11px;font-weight:700;color:#fff}
+.cost-head-sub{font-size:9.5px;color:rgba(255,255,255,.45);margin-top:2px}
+.cost-body{padding:10px 14px}
+.cost-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:10.5px;border-bottom:1px solid var(--paper3)}
+.cost-row:last-child{border-bottom:none}
+.cost-row-label{color:var(--ink3)}
+.cost-row-val{color:var(--ink2);font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:500}
+.cost-divider{height:1px;background:var(--paper3);margin:6px 0}
+.cost-total{display:flex;justify-content:space-between;align-items:center;padding:6px 8px;background:var(--accent-light);border:1px solid #b6dfc8;border-radius:6px;margin-top:6px}
+.cost-total-label{font-size:10.5px;font-weight:700;color:var(--accent)}
+.cost-total-val{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--accent)}
+.cost-dl{
+  display:flex;align-items:center;justify-content:center;gap:5px;
+  padding:6px;margin:8px 14px 12px;background:var(--accent-light);
+  border:1px solid #b6dfc8;border-radius:6px;color:var(--accent);
+  font-size:10px;font-weight:700;cursor:pointer;transition:all .14s;
+}
+.cost-dl:hover{background:rgba(26,107,74,.18)}
+
+/* 3D Render preview card */
+.render-card-img{
+  height:88px;
+  background:linear-gradient(135deg,#1e3a5f,#1a4a30,#2d1b69);
+  display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;
+}
+.render-card-img::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 40% 60%,rgba(26,107,74,.25),transparent 55%)}
+.render-card-tag{position:absolute;top:7px;right:7px;background:rgba(26,107,74,.85);color:#fff;font-size:8px;font-weight:700;padding:2px 7px;border-radius:4px}
+.render-card-footer{padding:9px 14px;display:flex;align-items:center;justify-content:space-between}
+.render-card-label{font-size:11px;font-weight:600;color:var(--ink)}
+.render-card-sub{font-size:10px;color:var(--ink3);margin-top:1px}
+
+/* Booking card */
+.booking-out-card{
+  background:var(--accent-light);border:1px solid #b6dfc8;border-radius:var(--rl);
+  padding:12px 14px;
+  opacity:0;transform:translateY(8px);transition:opacity .35s,transform .35s;
+}
+.booking-out-card.show{opacity:1;transform:translateY(0)}
+.booking-out-title{font-size:11px;font-weight:700;color:var(--accent);display:flex;align-items:center;gap:5px;margin-bottom:8px}
+.booking-out-items{display:flex;flex-direction:column;gap:5px}
+.booking-out-item{font-size:10.5px;color:var(--ink2);display:flex;align-items:flex-start;gap:6px;line-height:1.45}
+.booking-out-item::before{content:'✓';color:var(--accent);font-weight:700;flex-shrink:0;font-size:11px}
+
+/* Log bar at bottom */
+.lg-log-bar{
+  height:34px;background:var(--paper);border-top:var(--bd);
+  padding:0 20px;display:flex;align-items:center;flex-shrink:0;
+  overflow:hidden;
+}
+.lg-log-entry{
+  font-size:10.5px;font-family:'JetBrains Mono',monospace;
+  color:var(--ink3);display:flex;align-items:center;gap:6px;
+}
+.lg-log-entry.success{color:var(--accent)}
+.lg-log-entry.warn{color:var(--amber-mid)}
+.lg-log-entry::before{content:'›';font-weight:700;font-size:13px}
+
+/* Mobile responsive */
+@media(max-width:900px){
+  .sc-right{width:100%;min-width:0;border-left:none;border-top:var(--bd)}
+  .lg-scenario.active{flex-direction:column}
+  .sc-content-row{flex-direction:column!important}
+  .sc-left{border-right:none;border-bottom:var(--bd);padding:16px;min-height:auto}
+  .laptop-wrap{width:100%;max-width:360px}
+  .ig-wa-wrap{flex-direction:column;gap:10px}
+  .sc-arrow{flex-direction:row;gap:8px}
+  .sc-arrow-line{width:20px;height:0;border-top:1px solid;border-image:linear-gradient(to right,#8b5cf6,var(--accent)) 1}
+}
+@media(max-width:600px){
+  .laptop-wrap{display:none}
+  .lg-subnav{padding:0 12px;height:44px}
+  .lg-subnav-left{gap:4px}
+  .lg-subtab{padding:5px 10px;font-size:11px}
+  .sc-left{padding:12px;justify-content:center}
+  .ig-ph{width:150px}
+  .ig-ph .ig-scr{height:300px}
+  .wa-ph{width:160px}
+  .wa-ph-scr{height:300px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="gnav">
+  <div class="glogo">
+    <div class="glogo-mark">B</div>
+    <div class="glogo-name">BuildTrack</div>
+  </div>
+  <div class="gtabs">
+    <button class="gtab active" onclick="go('leadgen')" id="tab-leadgen">🤖 &nbsp;AI Lead Gen</button>
+    <button class="gtab" onclick="go('demo')" id="tab-demo">💬 &nbsp;WhatsApp Flows</button>
+    <button class="gtab" onclick="go('builder')" id="tab-builder">🏗️ &nbsp;Builder View</button>
+    <button class="gtab" onclick="go('client')" id="tab-client">👤 &nbsp;Client View</button>
+  </div>
+  <div class="gspacer"></div>
+  <div class="gmeta"><div class="gav">RK</div>Rajesh Kumar</div>
+</nav>
+
+<!-- ══ PAGE: DEMO ══════════════════════════════════════ -->
+<div class="page" id="page-demo">
+<div class="dshell">
+  <div class="dleft">
+    <div class="sg">Expense Flows</div>
+    <button class="scbtn active" onclick="loadScene(0)" id="sb0"><div class="scbtn-ic">₹</div><div><div class="scbtn-ti">Log Expense — Text</div><div class="scbtn-ds">Builder texts a payment</div></div></button>
+    <button class="scbtn" onclick="loadScene(1)" id="sb1"><div class="scbtn-ic">🎙</div><div><div class="scbtn-ti">Log Expense — Voice</div><div class="scbtn-ds">Voice note, AI transcribes</div></div></button>
+    <button class="scbtn" onclick="loadScene(2)" id="sb2"><div class="scbtn-ic">📊</div><div><div class="scbtn-ti">Check Budget</div><div class="scbtn-ds">Instant spend breakdown</div></div></button>
+    <div class="sg" style="margin-top:6px">Client Flows</div>
+    <button class="scbtn" onclick="loadScene(3)" id="sb3"><div class="scbtn-ic">📤</div><div><div class="scbtn-ti">Send Update to Client</div><div class="scbtn-ds">Client gets notification link</div></div></button>
+    <button class="scbtn" onclick="loadScene(4)" id="sb4"><div class="scbtn-ic">📥</div><div><div class="scbtn-ti">Request Doc from Client</div><div class="scbtn-ds">Client replies, bot notifies</div></div></button>
+    <button class="scbtn" onclick="loadScene(5)" id="sb5"><div class="scbtn-ic">💳</div><div><div class="scbtn-ti">Request Payment</div><div class="scbtn-ds">Client gets payment card</div></div></button>
+  </div>
+
+  <div class="dcenter">
+    <div class="schead">
+      <div class="scpill" id="scpill">Feature 1 — Expense Tracking</div>
+      <h2 id="sctitle">Log an expense with one text</h2>
+      <p id="scsub">Builder types naturally — AI extracts amount, vendor, category and site automatically</p>
+    </div>
+
+    <div class="pframe">
+      <div class="pinner">
+        <div class="pnotch"></div>
+        <div class="wabar" id="wabar">
+          <div class="waav" id="waav">🤖</div>
+          <div style="flex:1"><div class="wanm" id="wanm">Construction Bot</div><div class="wast" id="wast">online</div></div>
+          <div class="waic"><div class="wai">📹</div><div class="wai">📞</div><div class="wai">⋮</div></div>
+        </div>
+        <div class="wamsgs" id="wamsgs">
+          <div class="dtdiv"><span>Today</span></div>
+          <div class="typbl" id="typbl"><div class="td"></div><div class="td"></div><div class="td"></div></div>
+        </div>
+        <div class="wabot">
+          <div style="font-size:16px;color:#9ca3af">😊</div>
+          <div class="wainp">Message</div>
+          <div style="font-size:16px;color:#9ca3af">📎</div>
+          <div class="wasend">🎤</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dctrl">
+      <button class="cbtn cnav" onclick="prevSc()">◀</button>
+      <button class="cbtn cplay" id="playBtn" onclick="togglePlay()">▶</button>
+      <button class="cbtn cnav" onclick="nextSc()">▶▶</button>
+      <div class="ctrk"><div class="cfill" id="cfill"></div></div>
+      <div class="clbl" id="clbl">1 / 6</div>
+    </div>
+  </div>
+
+  <div class="dright" id="ipanel">
+    <div class="sublabel">What's happening</div>
+  </div>
+</div>
+</div>
+
+<!-- ══ PAGE: BUILDER ══════════════════════════════════ -->
+<div class="page" id="page-builder">
+<div class="lshell">
+  <div class="lsb">
+    <div class="sg">Overview</div>
+    <button class="si active" onclick="bnav(this,'b-exp')"><span class="si-ic">₹</span>Expenses<span class="si-ct">34</span></button>
+    <button class="si" onclick="bnav(this,'b-chats')"><span class="si-ic">💬</span>Client Messages<span class="si-ct">2</span></button>
+    <button class="si" onclick="bnav(this,'b-vendors')"><span class="si-ic">🏪</span>Vendor History</button>
+    <button class="si" onclick="bnav(this,'b-payments')"><span class="si-ic">💳</span>Payments</button>
+    <div class="sg" style="margin-top:6px">Projects</div>
+    <button class="si" onclick="bnav(this,'b-exp')"><span class="si-ic">📍</span>Indiranagar</button>
+    <button class="si" style="opacity:.35;pointer-events:none"><span class="si-ic">📍</span>Whitefield</button>
+    <button class="si" style="opacity:.35;pointer-events:none"><span class="si-ic">📍</span>Koramangala</button>
+  </div>
+  <div class="lmain">
+
+    <!-- EXPENSES -->
+    <div id="b-exp">
+      <div class="pgh">
+        <div><h1>Expense Tracker</h1><p>All logged expenses, updated in real time via WhatsApp bot</p></div>
+        <div class="pgh-r">
+          <select class="sel"><option>All Projects</option><option>Indiranagar</option><option>Whitefield</option></select>
+          <select class="sel"><option>This Month</option><option>Last Month</option><option>All Time</option></select>
+          <button class="btn btn-g btn-sm">Export CSV</button>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="sbox"><div class="slb">Total Spent</div><div class="sv">₹2.46L</div><div class="ss up">↑ ₹12,000 this week</div><div class="sbar"><div class="sfill" style="width:49%;background:var(--accent)"></div></div></div>
+        <div class="sbox"><div class="slb">Budget Remaining</div><div class="sv">₹2.54L</div><div class="ss">of ₹5,00,000 allocated</div><div class="sbar"><div class="sfill" style="width:51%;background:var(--blue-mid)"></div></div></div>
+        <div class="sbox"><div class="slb">Transactions</div><div class="sv">34</div><div class="ss up">3 logged today</div><div class="sbar"><div class="sfill" style="width:68%;background:var(--amber-mid)"></div></div></div>
+        <div class="sbox"><div class="slb">Avg Transaction</div><div class="sv">₹7.2K</div><div class="ss">across all categories</div><div class="sbar"><div class="sfill" style="width:36%;background:#7c3aed"></div></div></div>
+      </div>
+      <div class="twocol">
+        <div class="card">
+          <div class="chead"><h3>Recent Expenses</h3><div class="chr"><button class="btn btn-g btn-sm">View all</button></div></div>
+          <div>
+            <div class="erow"><div class="epip" style="background:#16a34a"></div><div class="einf"><div class="evn">Raju — Sri Sai Traders</div><div class="emeta">Material · Indiranagar · Today 10:32</div></div><div><div class="eamt">₹5,000</div><span class="bdg bdg-n" style="font-size:10px;margin-top:2px;display:block;text-align:right">Cash</span></div></div>
+            <div class="erow"><div class="epip" style="background:#d97706"></div><div class="einf"><div class="evn">Suresh Mason</div><div class="emeta">Labour · Whitefield · Today 11:15</div></div><div><div class="eamt">₹12,000</div><span class="bdg bdg-b" style="font-size:10px;margin-top:2px;display:block;text-align:right">GPay</span></div></div>
+            <div class="erow"><div class="epip" style="background:#2563eb"></div><div class="einf"><div class="evn">Lakshmi Transport</div><div class="emeta">Transport · Indiranagar · Yesterday</div></div><div><div class="eamt">₹3,500</div><span class="bdg bdg-n" style="font-size:10px;margin-top:2px;display:block;text-align:right">Cash</span></div></div>
+            <div class="erow"><div class="epip" style="background:#16a34a"></div><div class="einf"><div class="evn">Shivanna — Sand Supply</div><div class="emeta">Material · Indiranagar · Yesterday</div></div><div><div class="eamt">₹8,200</div><span class="bdg bdg-b" style="font-size:10px;margin-top:2px;display:block;text-align:right">PhonePe</span></div></div>
+            <div class="erow"><div class="epip" style="background:#d97706"></div><div class="einf"><div class="evn">Daily Labour — 4 workers</div><div class="emeta">Labour · Koramangala · 2 days ago</div></div><div><div class="eamt">₹4,800</div><span class="bdg bdg-n" style="font-size:10px;margin-top:2px;display:block;text-align:right">Cash</span></div></div>
+            <div class="erow"><div class="epip" style="background:#7c3aed"></div><div class="einf"><div class="evn">Kumar JCB Rental</div><div class="emeta">Equipment · Whitefield · 3 days ago</div></div><div><div class="eamt">₹9,000</div><span class="bdg bdg-g" style="font-size:10px;margin-top:2px;display:block;text-align:right">NEFT</span></div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="chead"><h3>Spend by Category</h3><span class="bdg bdg-n">All projects</span></div>
+          <div class="catlist">
+            <div class="catrow"><div class="catr-top"><span class="catnm">Material</span><span class="catamt" style="color:#16a34a">₹98,400</span></div><div class="cattrk"><div class="catfill" style="width:80%;background:#16a34a"></div></div></div>
+            <div class="catrow"><div class="catr-top"><span class="catnm">Labour</span><span class="catamt" style="color:#d97706">₹72,000</span></div><div class="cattrk"><div class="catfill" style="width:58%;background:#d97706"></div></div></div>
+            <div class="catrow"><div class="catr-top"><span class="catnm">Equipment</span><span class="catamt" style="color:#7c3aed">₹45,000</span></div><div class="cattrk"><div class="catfill" style="width:36%;background:#7c3aed"></div></div></div>
+            <div class="catrow"><div class="catr-top"><span class="catnm">Transport</span><span class="catamt" style="color:#2563eb">₹22,500</span></div><div class="cattrk"><div class="catfill" style="width:18%;background:#2563eb"></div></div></div>
+            <div class="catrow"><div class="catr-top"><span class="catnm">Misc</span><span class="catamt" style="color:#6b7280">₹8,200</span></div><div class="cattrk"><div class="catfill" style="width:7%;background:#9ca3af"></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHATS -->
+    <div id="b-chats" style="display:none">
+      <div class="pgh"><div><h1>Client Messages</h1><p>All WhatsApp conversations and documents exchanged via the bot</p></div></div>
+      <div class="twocol" style="padding-top:18px">
+        <div class="card">
+          <div class="chead"><h3>Conversations</h3></div>
+          <div>
+            <div class="crow"><div class="cav" style="background:#e8f5ee;color:#1a6b4a">S</div><div class="einf"><div class="cnm">Sharma</div><div class="cprev">Viewed the site progress update ✓</div></div><div><div class="ctime">10:45</div><div class="unrd">2</div></div></div>
+            <div class="crow"><div class="cav" style="background:#eff6ff;color:#1e3a5f">R</div><div class="einf"><div class="cnm">Reddy</div><div class="cprev">📎 FloorPlan_v2.pdf sent</div></div><div><div class="ctime">Yesterday</div></div></div>
+            <div class="crow"><div class="cav" style="background:#faf5ff;color:#7c3aed">M</div><div class="einf"><div class="cnm">Mehta</div><div class="cprev">Payment of ₹50,000 received ✓</div></div><div><div class="ctime">Mon</div></div></div>
+            <div class="crow"><div class="cav" style="background:#fffbeb;color:#92400e">P</div><div class="einf"><div class="cnm">Pillai</div><div class="cprev">Progress photo received ✓</div></div><div><div class="ctime">Sun</div></div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="chead"><h3>Documents Exchanged</h3></div>
+          <div>
+            <div class="erow"><div style="font-size:15px">📄</div><div class="einf"><div class="evn">FloorPlan_v2.pdf</div><div class="emeta">From Reddy · Indiranagar · Today</div></div><span class="bdg bdg-g">Received</span></div>
+            <div class="erow"><div style="font-size:15px">🖼️</div><div class="einf"><div class="evn">Site_Progress_Apr.jpg</div><div class="emeta">Sent to Sharma · Yesterday</div></div><span class="bdg bdg-g">Delivered</span></div>
+            <div class="erow"><div style="font-size:15px">📄</div><div class="einf"><div class="evn">Khata_Certificate.pdf</div><div class="emeta">Sent to Mehta · Mon</div></div><span class="bdg bdg-g">Delivered</span></div>
+            <div class="erow"><div style="font-size:15px">📄</div><div class="einf"><div class="evn">SanctionPlan_v1.pdf</div><div class="emeta">Requested from Pillai</div></div><span class="bdg bdg-a">Pending</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VENDORS -->
+    <div id="b-vendors" style="display:none">
+      <div class="pgh"><div><h1>Vendor History</h1><p>All suppliers and workers paid through the WhatsApp bot</p></div><div class="pgh-r"><button class="btn btn-g btn-sm">Export CSV</button></div></div>
+      <div class="fullcol" style="padding-top:18px">
+        <div class="card"><div class="twrap"><table class="dt">
+          <thead><tr><th>Vendor</th><th>Category</th><th>Transactions</th><th>Total Paid</th><th>Last Payment</th><th>Mode</th></tr></thead>
+          <tbody>
+            <tr><td class="nc">Raju — Sri Sai Traders</td><td><span class="bdg bdg-g">Material</span></td><td>8</td><td class="mn">₹38,500</td><td>Today</td><td>Cash</td></tr>
+            <tr><td class="nc">Suresh Mason</td><td><span class="bdg bdg-a">Labour</span></td><td>12</td><td class="mn">₹62,000</td><td>Today</td><td>GPay</td></tr>
+            <tr><td class="nc">Lakshmi Transport</td><td><span class="bdg bdg-b">Transport</span></td><td>5</td><td class="mn">₹22,500</td><td>Yesterday</td><td>Cash</td></tr>
+            <tr><td class="nc">Shivanna — Sand</td><td><span class="bdg bdg-g">Material</span></td><td>4</td><td class="mn">₹24,800</td><td>Yesterday</td><td>PhonePe</td></tr>
+            <tr><td class="nc">Daily Labour Pool</td><td><span class="bdg bdg-a">Labour</span></td><td>22</td><td class="mn">₹48,400</td><td>2 days ago</td><td>Cash</td></tr>
+            <tr><td class="nc">Kumar JCB Rental</td><td><span class="bdg bdg-b">Equipment</span></td><td>3</td><td class="mn">₹27,000</td><td>3 days ago</td><td>NEFT</td></tr>
+            <tr><td class="nc">Bangalore Cement Depot</td><td><span class="bdg bdg-g">Material</span></td><td>6</td><td class="mn">₹41,200</td><td>Last week</td><td>GPay</td></tr>
+          </tbody>
+        </table></div></div>
+      </div>
+    </div>
+
+    <!-- PAYMENTS -->
+    <div id="b-payments" style="display:none">
+      <div class="pgh"><div><h1>Payment Requests</h1><p>Milestone payments requested from clients via WhatsApp</p></div><div class="pgh-r"><button class="btn btn-p btn-sm">+ New Request</button></div></div>
+      <div class="fullcol" style="padding-top:18px">
+        <div class="card"><div class="twrap"><table class="dt">
+          <thead><tr><th>Client</th><th>Milestone</th><th>Amount</th><th>Requested</th><th>Due Date</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td class="nc">Mehta</td><td>Foundation completion</td><td class="mn">₹50,000</td><td>Mar 5</td><td>Mar 15</td><td><span class="bdg bdg-g"><span class="bdg-dot"></span>Paid</span></td></tr>
+            <tr><td class="nc">Sharma</td><td>Ground floor slab</td><td class="mn">₹75,000</td><td>Mar 30</td><td>Apr 10</td><td><span class="bdg bdg-g"><span class="bdg-dot"></span>Paid</span></td></tr>
+            <tr><td class="nc">Sharma</td><td>First floor slab</td><td class="mn">₹75,000</td><td>Apr 12</td><td>Apr 25</td><td><span class="bdg bdg-a"><span class="bdg-dot"></span>Pending</span></td></tr>
+            <tr><td class="nc">Reddy</td><td>Brickwork completion</td><td class="mn">₹40,000</td><td>Apr 10</td><td>Apr 20</td><td><span class="bdg bdg-r"><span class="bdg-dot"></span>Overdue</span></td></tr>
+          </tbody>
+        </table></div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- ══ PAGE: CLIENT ═══════════════════════════════════ -->
+<div class="page" id="page-client">
+
+  <!-- Hero -->
+  <div class="chero">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <div><h1>Indiranagar Residence</h1><div class="chero-sub">2BHK + Study · G+2 floors · Contractor: Rajesh Kumar</div></div>
+      <span class="bdg bdg-g" style="font-size:12px;padding:5px 12px"><span class="bdg-dot"></span>In Progress</span>
+    </div>
+    <div class="chero-meta">
+      <div class="cmi">📅 Started Jan 12</div>
+      <div class="cmi">🏁 Est. Aug 20, 2025</div>
+      <div class="cmi">📐 2,400 sq ft</div>
+      <div class="cprog">62% complete</div>
+    </div>
+  </div>
+
+  <!-- Client sub-tabs -->
+  <div style="background:var(--paper);border-bottom:var(--bd);display:flex;padding:0 24px;gap:0;position:sticky;top:52px;z-index:100">
+    <button class="gtab active" onclick="ctab(this,'c-progress')" style="height:44px;font-size:12px">📋 &nbsp;Progress</button>
+    <button class="gtab" onclick="ctab(this,'c-docs')" style="height:44px;font-size:12px">📁 &nbsp;Documents</button>
+    <button class="gtab" onclick="ctab(this,'c-payments')" style="height:44px;font-size:12px">💳 &nbsp;Payments</button>
+  </div>
+
+  <!-- ── TAB: PROGRESS ── -->
+  <div id="c-progress">
+    <div class="cbody">
+      <div class="cleft">
+        <div class="sublabel">Construction Progress</div>
+        <div class="tl">
+          <div class="tli done"><div class="tldot">✓</div><div class="tlbd"><div class="tltitle">Foundation & Excavation</div><div class="tldate">Completed · Jan 12 – Feb 4</div><div class="tlnote">Foundation dug to 8 ft depth. Soil testing done. PCC laid and approved by engineer.</div><div class="tlchips"><span class="tlchip">PCC done</span><span class="tlchip">Soil tested</span><span class="tlchip">Approved</span></div></div></div>
+          <div class="tli done"><div class="tldot">✓</div><div class="tlbd"><div class="tltitle">Column & Beam Work — Ground Floor</div><div class="tldate">Completed · Feb 8 – Mar 2</div><div class="tlnote">All 14 columns cast. Beam shuttering and concrete poured. 21-day curing complete.</div><div class="tlchips"><span class="tlchip">14 columns cast</span><span class="tlchip">Curing done</span></div></div></div>
+          <div class="tli done"><div class="tldot">✓</div><div class="tlbd"><div class="tltitle">Ground Floor Slab</div><div class="tldate">Completed · Mar 6 – Mar 28</div><div class="tlnote">Slab poured and cured. De-shuttering complete. Ready for brickwork.</div><div class="tlbar"><div class="tlbarfill" style="width:100%"></div></div></div></div>
+          <div class="tli current"><div class="tldot">→</div><div class="tlbd"><div class="tltitle">First Floor — Brickwork & Slab</div><div class="tldate">In Progress · Apr 2 – Est. May 15</div><div class="tlnote">Ground floor brickwork 70% complete. First floor column shuttering started this week. On schedule.</div><div class="tlbar"><div class="tlbarfill" style="width:65%"></div></div><div class="tlchips"><span class="tlchip">Brickwork 70%</span><span class="tlchip">Shuttering started</span></div></div></div>
+          <div class="tli upcoming"><div class="tldot">○</div><div class="tlbd"><div class="tltitle">Second Floor & Roof Slab</div><div class="tldate">Upcoming · Est. May 20 – Jul 10</div><div class="tlnote">Second floor columns, beams, final roof slab and waterproofing treatment.</div></div></div>
+          <div class="tli upcoming"><div class="tldot">○</div><div class="tlbd"><div class="tltitle">Plastering, Tiling & Finishing</div><div class="tldate">Upcoming · Est. Jul 15 – Aug 20</div><div class="tlnote">Internal plaster, flooring, bathroom fittings, electrical and plumbing finish.</div></div></div>
+        </div>
+      </div>
+      <div class="cright">
+        <div class="sublabel">Site Photos</div>
+        <div class="pgrid" style="margin-bottom:18px">
+          <div class="ptile pt1">🏗️<div class="ptlbl">Foundation · Jan</div></div>
+          <div class="ptile pt2">🧱<div class="ptlbl">Columns · Feb</div></div>
+          <div class="ptile pt3">⚙️<div class="ptlbl">Slab · Mar</div></div>
+          <div class="ptile pt4">🏠<div class="ptlbl">GF done · Mar 28</div></div>
+          <div class="ptile pt5">🧱<div class="ptlbl">Brickwork · Apr</div></div>
+          <div class="ptile pt2">🔨<div class="ptlbl">Latest · Apr 12</div></div>
+        </div>
+        <div class="sublabel">Quick Links</div>
+        <div class="doclist">
+          <div class="doccard" onclick="ctab(document.querySelectorAll('#page-client .gtab')[1],'c-docs')"><div class="dcic dc-pdf">📁</div><div class="dcinf"><div class="dcnm">View all documents →</div><div class="dcmeta">9 files · 2 new from builder</div></div></div>
+          <div class="doccard" onclick="ctab(document.querySelectorAll('#page-client .gtab')[2],'c-payments')"><div class="dcic" style="background:#fffbeb;border:1px solid #fde68a">💳</div><div class="dcinf"><div class="dcnm">View payment history →</div><div class="dcmeta">₹75,000 due · Apr 25</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TAB: DOCUMENTS ── -->
+  <div id="c-docs" style="display:none">
+    <div style="padding:20px 28px 0;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-size:16px;font-weight:600;color:var(--ink)">All Documents</div>
+        <div style="font-size:12px;color:var(--ink3);margin-top:2px">9 files · 2 unread</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <select class="sel">
+          <option>All Types</option>
+          <option>PDFs</option>
+          <option>Photos</option>
+          <option>Drawings</option>
+        </select>
+        <select class="sel">
+          <option>All Directions</option>
+          <option>Received from Builder</option>
+          <option>Sent by Me</option>
+          <option>Pending</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Section: Received from Builder -->
+    <div style="padding:20px 28px 0">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--ink4);margin-bottom:10px">Received from Builder</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px">
+
+        <div class="doccard" style="flex-direction:column;align-items:flex-start;gap:0;padding:0;overflow:hidden">
+          <div style="background:var(--accent-light);width:100%;padding:14px 14px 10px;display:flex;align-items:center;gap:10px;border-bottom:var(--bd)">
+            <div class="dcic dc-pdf" style="flex-shrink:0">📄</div>
+            <div style="flex:1;min-width:0"><div class="dcnm">Approved_SanctionPlan.pdf</div><div class="dcmeta">3.2 MB · PDF</div></div>
+            <span class="bdg bdg-g" style="font-size:10px;flex-shrink:0">New</span>
+          </div>
+          <div style="padding:10px 14px;width:100%">
+            <div style="font-size:11px;color:var(--ink2);line-height:1.5;margin-bottom:8px">Municipal sanction plan approved by BBMP. Valid for construction up to G+2 floors.</div>
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <span style="font-size:10px;color:var(--ink3)">Shared Apr 2, 2025</span>
+              <button class="btn btn-g btn-sm" style="font-size:10px">Download</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="doccard" style="flex-direction:column;align-items:flex-start;gap:0;padding:0;overflow:hidden">
+          <div style="background:var(--paper2);width:100%;padding:14px 14px 10px;display:flex;align-items:center;gap:10px;border-bottom:var(--bd)">
+            <div class="dcic dc-img" style="flex-shrink:0">🖼️</div>
+            <div style="flex:1;min-width:0"><div class="dcnm">Site_Progress_Apr12.jpg</div><div class="dcmeta">2.1 MB · JPEG</div></div>
+            <span class="bdg bdg-g" style="font-size:10px;flex-shrink:0">New</span>
+          </div>
+          <div style="padding:10px 14px;width:100%">
+            <div style="font-size:11px;color:var(--ink2);line-height:1.5;margin-bottom:8px">Latest site photo showing brickwork progress on ground floor — taken Apr 12.</div>
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <span style="font-size:10px;color:var(--ink3)">Shared Apr 12, 2025</span>
+              <button class="btn btn-g btn-sm" style="font-size:10px">Download</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="doccard" style="flex-direction:column;align-items:flex-start;gap:0;padding:0;overflow:hidden">
+          <div style="background:var(--paper2);width:100%;padding:14px 14px 10px;display:flex;align-items:center;gap:10px;border-bottom:var(--bd)">
+            <div class="dcic dc-pdf" style="flex-shrink:0">📄</div>
+            <div style="flex:1;min-width:0"><div class="dcnm">Khata_Certificate.pdf</div><div class="dcmeta">1.1 MB · PDF</div></div>
+            <span class="bdg bdg-n" style="font-size:10px;flex-shrink:0">Seen</span>
+          </div>
+          <div style="padding:10px 14px;width:100%">
+            <div style="font-size:11px;color:var(--ink2);line-height:1.5;margin-bottom:8px">Khata certificate issued by BBMP confirming property ownership and tax registration.</div>
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <span style="font-size:10px;color:var(--ink3)">Shared Mar 15, 2025</span>
+              <button class="btn btn-g btn-sm" style="font-size:10px">Download</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="doccard" style="flex-direction:column;align-items:flex-start;gap:0;padding:0;overflow:hidden">
+          <div style="background:var(--paper2);width:100%;padding:14px 14px 10px;display:flex;align-items:center;gap:10px;border-bottom:var(--bd)">
+            <div class="dcic dc-pdf" style="flex-shrink:0">📄</div>
+            <div style="flex:1;min-width:0"><div class="dcnm">SoilTestReport.pdf</div><div class="dcmeta">890 KB · PDF</div></div>
+            <span class="bdg bdg-n" style="font-size:10px;flex-shrink:0">Seen</span>
+          </div>
+          <div style="padding:10px 14px;width:100%">
+            <div style="font-size:11px;color:var(--ink2);line-height:1.5;margin-bottom:8px">Geotechnical soil test report. Safe bearing capacity: 18 t/m². No issues found.</div>
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <span style="font-size:10px;color:var(--ink3)">Shared Jan 14, 2025</span>
+              <button class="btn btn-g btn-sm" style="font-size:10px">Download</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="doccard" style="flex-direction:column;align-items:flex-start;gap:0;padding:0;overflow:hidden">
+          <div style="background:var(--paper2);width:100%;padding:14px 14px 10px;display:flex;align-items:center;gap:10px;border-bottom:var(--bd)">
+            <div class="dcic dc-img" style="flex-shrink:0">🖼️</div>
+            <div style="flex:1;min-width:0"><div class="dcnm">Foundation_Completion.jpg</div><div class="dcmeta">2.4 MB · JPEG</div></div>
+            <span class="bdg bdg-n" style="font-size:10px;flex-shrink:0">Seen</span>
+          </div>
+          <div style="padding:10px 14px;width:100%">
+            <div style="font-size:11px;color:var(--ink2);line-height:1.5;margin-bottom:8px">Foundation completion photo after PCC and curing — Feb 5, 2025.</div>
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <span style="font-size:10px;color:var(--ink3)">Shared Feb 5, 2025</span>
+              <button class="btn btn-g btn-sm" style="font-size:10px">Download</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="doccard" style="flex-direction:column;align-items:flex-start;gap:0;padding:0;overflow:hidden">
+          <div style="background:var(--paper2);width:100%;padding:14px 14px 10px;display:flex;align-items:center;gap:10px;border-bottom:var(--bd)">
+            <div class="dcic dc-img" style="flex-shrink:0">🖼️</div>
+            <div style="flex:1;min-width:0"><div class="dcnm">GF_Slab_Complete.jpg</div><div class="dcmeta">1.8 MB · JPEG</div></div>
+            <span class="bdg bdg-n" style="font-size:10px;flex-shrink:0">Seen</span>
+          </div>
+          <div style="padding:10px 14px;width:100%">
+            <div style="font-size:11px;color:var(--ink2);line-height:1.5;margin-bottom:8px">Ground floor slab completion after de-shuttering — Mar 28, 2025.</div>
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <span style="font-size:10px;color:var(--ink3)">Shared Mar 28, 2025</span>
+              <button class="btn btn-g btn-sm" style="font-size:10px">Download</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Section: Sent by You -->
+    <div style="padding:24px 28px 0">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--ink4);margin-bottom:10px">Sent by You</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px">
+
+        <div class="doccard" style="flex-direction:column;align-items:flex-start;gap:0;padding:0;overflow:hidden">
+          <div style="background:var(--paper2);width:100%;padding:14px 14px 10px;display:flex;align-items:center;gap:10px;border-bottom:var(--bd)">
+            <div class="dcic dc-cad" style="flex-shrink:0">📐</div>
+            <div style="flex:1;min-width:0"><div class="dcnm">FloorPlan_v2.pdf</div><div class="dcmeta">2.4 MB · PDF</div></div>
+            <span class="bdg bdg-g" style="font-size:10px;flex-shrink:0">Delivered</span>
+          </div>
+          <div style="padding:10px 14px;width:100%">
+            <div style="font-size:11px;color:var(--ink2);line-height:1.5;margin-bottom:8px">Revised floor plan v2 with updated bedroom dimensions and study room layout.</div>
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <span style="font-size:10px;color:var(--ink3)">Sent Today, 16:22</span>
+              <button class="btn btn-g btn-sm" style="font-size:10px">Download</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="doccard" style="flex-direction:column;align-items:flex-start;gap:0;padding:0;overflow:hidden">
+          <div style="background:var(--paper2);width:100%;padding:14px 14px 10px;display:flex;align-items:center;gap:10px;border-bottom:var(--bd)">
+            <div class="dcic dc-pdf" style="flex-shrink:0">📄</div>
+            <div style="flex:1;min-width:0"><div class="dcnm">ElectricityBillCopy.pdf</div><div class="dcmeta">420 KB · PDF</div></div>
+            <span class="bdg bdg-n" style="font-size:10px;flex-shrink:0">Seen</span>
+          </div>
+          <div style="padding:10px 14px;width:100%">
+            <div style="font-size:11px;color:var(--ink2);line-height:1.5;margin-bottom:8px">EB bill copy for existing connection — required for new connection application.</div>
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <span style="font-size:10px;color:var(--ink3)">Sent Mar 10, 2025</span>
+              <button class="btn btn-g btn-sm" style="font-size:10px">Download</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Section: Pending from Builder -->
+    <div style="padding:24px 28px 28px">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--ink4);margin-bottom:10px">Pending from Builder</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px">
+
+        <div class="doccard" style="flex-direction:column;align-items:flex-start;gap:0;padding:0;overflow:hidden;opacity:.75">
+          <div style="background:var(--amber-light);width:100%;padding:14px 14px 10px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #fde68a">
+            <div class="dcic" style="background:#fef3c7;border:1px solid #fde68a;flex-shrink:0">📄</div>
+            <div style="flex:1;min-width:0"><div class="dcnm">StructuralDrawing_FF.pdf</div><div class="dcmeta">Expected this week</div></div>
+            <span class="bdg bdg-a" style="font-size:10px;flex-shrink:0">Pending</span>
+          </div>
+          <div style="padding:10px 14px;width:100%">
+            <div style="font-size:11px;color:var(--ink2);line-height:1.5">First floor structural drawing showing column positions and beam layout. Requested Apr 10.</div>
+          </div>
+        </div>
+
+        <div class="doccard" style="flex-direction:column;align-items:flex-start;gap:0;padding:0;overflow:hidden;opacity:.75">
+          <div style="background:var(--amber-light);width:100%;padding:14px 14px 10px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #fde68a">
+            <div class="dcic" style="background:#fef3c7;border:1px solid #fde68a;flex-shrink:0">🖼️</div>
+            <div style="flex:1;min-width:0"><div class="dcnm">FirstFloor_Progress.jpg</div><div class="dcmeta">Expected soon</div></div>
+            <span class="bdg bdg-a" style="font-size:10px;flex-shrink:0">Pending</span>
+          </div>
+          <div style="padding:10px 14px;width:100%">
+            <div style="font-size:11px;color:var(--ink2);line-height:1.5">Site progress photo of first floor shuttering work. Requested Apr 12.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TAB: PAYMENTS ── -->
+  <div id="c-payments" style="display:none;padding:24px 28px">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px">
+      <div class="sbox"><div class="slb">Total Contract Value</div><div class="sv">₹3,50,000</div><div class="ss">Full project estimate</div></div>
+      <div class="sbox"><div class="slb">Paid So Far</div><div class="sv" style="color:var(--accent)">₹1,25,000</div><div class="ss up">2 milestones cleared</div></div>
+      <div class="sbox"><div class="slb">Next Due</div><div class="sv" style="color:var(--amber-mid)">₹75,000</div><div class="ss">Due Apr 25 · First floor slab</div></div>
+    </div>
+
+    <div class="card" style="margin-bottom:20px">
+      <div class="chead"><h3>Payment Schedule</h3></div>
+      <div class="twrap">
+        <table class="dt">
+          <thead><tr><th>#</th><th>Milestone</th><th>Amount</th><th>Due Date</th><th>Paid On</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+            <tr>
+              <td style="color:var(--ink3)">1</td>
+              <td class="nc">Foundation completion</td>
+              <td class="mn">₹50,000</td>
+              <td>Mar 15</td>
+              <td style="color:var(--accent)">Mar 15</td>
+              <td><span class="bdg bdg-g"><span class="bdg-dot"></span>Paid</span></td>
+              <td><button class="btn btn-g btn-sm">Receipt</button></td>
+            </tr>
+            <tr>
+              <td style="color:var(--ink3)">2</td>
+              <td class="nc">Ground floor slab</td>
+              <td class="mn">₹75,000</td>
+              <td>Apr 10</td>
+              <td style="color:var(--accent)">Apr 10</td>
+              <td><span class="bdg bdg-g"><span class="bdg-dot"></span>Paid</span></td>
+              <td><button class="btn btn-g btn-sm">Receipt</button></td>
+            </tr>
+            <tr style="background:#fffbeb">
+              <td style="color:var(--ink3)">3</td>
+              <td class="nc">First floor slab</td>
+              <td class="mn">₹75,000</td>
+              <td style="color:var(--amber-mid);font-weight:500">Apr 25</td>
+              <td style="color:var(--ink4)">—</td>
+              <td><span class="bdg bdg-a"><span class="bdg-dot"></span>Pending</span></td>
+              <td><button class="btn btn-p btn-sm">Pay Now</button></td>
+            </tr>
+            <tr>
+              <td style="color:var(--ink3)">4</td>
+              <td class="nc">Second floor slab</td>
+              <td class="mn">₹75,000</td>
+              <td>Jul 10</td>
+              <td style="color:var(--ink4)">—</td>
+              <td><span class="bdg bdg-n">Upcoming</span></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td style="color:var(--ink3)">5</td>
+              <td class="nc">Finishing & handover</td>
+              <td class="mn">₹75,000</td>
+              <td>Aug 20</td>
+              <td style="color:var(--ink4)">—</td>
+              <td><span class="bdg bdg-n">Upcoming</span></td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div style="background:var(--accent-light);border:1px solid #b6dfc8;border-radius:var(--rl);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+      <div>
+        <div style="font-size:13px;font-weight:600;color:var(--accent)">First floor slab payment due Apr 25</div>
+        <div style="font-size:12px;color:var(--accent);opacity:.8;margin-top:2px">Pay via UPI · Your contractor will be notified automatically</div>
+      </div>
+      <button class="btn btn-p" style="font-size:14px;padding:10px 24px">Pay ₹75,000 →</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ── PAGE ROUTING ── */
+function go(n){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.gtab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+n).classList.add('active');
+  document.getElementById('tab-'+n).classList.add('active');
+}
+function bnav(el,s){
+  document.querySelectorAll('#page-builder .si').forEach(i=>i.classList.remove('active'));
+  el.classList.add('active');
+  ['b-exp','b-chats','b-vendors','b-payments'].forEach(id=>{
+    const e=document.getElementById(id);if(e)e.style.display=id===s?'block':'none';
+  });
+}
+
+/* ── SCENES ── */
+const S=[
+{
+  pill:'Feature 1 — Expense Tracking',
+  title:'Log an expense with one text',
+  sub:'Builder types naturally — AI extracts amount, vendor, category and site automatically',
+  cards:[
+    {i:'💬',t:'Natural language input',b:'No forms or apps. Builder types exactly as they would tell a colleague.'},
+    {i:'🤖',t:'Gemini parses the message',b:'Extracts ₹5,000 · Raju · cement · Indiranagar · cash from one sentence.'},
+    {i:'🗄️',t:'Saved to database',b:'Expense logged and project budget updated instantly with no manual entry.'},
+    {i:'📊',t:'Confirmation in WhatsApp',b:'Builder sees a clean summary and remaining budget immediately.'}
+  ],
+  steps:[
+    {d:700,t:'out',tx:'Gave 5000 cash to Raju for cement at the Indiranagar site',tm:'10:32'},
+    {d:1100,t:'typ'},{d:3100,t:'htyp'},
+    {d:3200,t:'in',tx:'✅ *Expense Logged*\n\n📍 Project: Indiranagar\n💰 Amount: ₹5,000\n🏷️ Category: Material\n👤 Vendor: Raju\n💳 Mode: Cash\n\n📊 *Budget*\nTotal:       ₹5,00,000\nSpent:           ₹5,000\nRemaining: ₹4,95,000',tm:'10:32'},
+    {d:3900,t:'l',i:0},{d:4300,t:'l',i:1},{d:4700,t:'l',i:2},{d:5100,t:'l',i:3}
+  ]
+},
+{
+  pill:'Feature 1 — Expense Tracking',
+  title:'Log an expense with a voice note',
+  sub:'Builder records on site — Gemini transcribes and logs it, same result as typing',
+  cards:[
+    {i:'🎙️',t:'Voice note sent',b:'Builder records directly in WhatsApp. No typing on a dusty construction site.'},
+    {i:'🔊',t:'Gemini transcribes audio',b:'Supports English, Hindi, Kannada and Hinglish natively — no extra setup.'},
+    {i:'🧠',t:'Same AI parsing',b:'Transcribed text runs through the same Gemini parser. Identical result.'},
+    {i:'✅',t:'Confirmation sent back',b:'Builder receives the same structured confirmation with updated budget.'}
+  ],
+  steps:[
+    {d:700,t:'voice',dur:'0:09',tm:'11:15'},
+    {d:1200,t:'typ'},
+    {d:2300,t:'in',tx:'🎙️ *Voice note received*\nTranscribing...',tm:'11:15'},
+    {d:3500,t:'htyp'},{d:3600,t:'typ'},{d:5100,t:'htyp'},
+    {d:5200,t:'in',tx:'✅ *Expense Logged*\n\n📍 Project: Whitefield\n💰 Amount: ₹12,000\n🏷️ Category: Labour\n👤 Vendor: Suresh Mason\n💳 Mode: GPay\n\n📊 *Budget*\nTotal:       ₹8,00,000\nSpent:        ₹12,000\nRemaining: ₹7,88,000',tm:'11:15'},
+    {d:5900,t:'l',i:0},{d:6300,t:'l',i:1},{d:6700,t:'l',i:2},{d:7100,t:'l',i:3}
+  ]
+},
+{
+  pill:'Feature 1 — Expense Tracking',
+  title:'Check the project budget anytime',
+  sub:'One question — instant category-wise breakdown, no spreadsheet needed',
+  cards:[
+    {i:'❓',t:'Natural question',b:'No command to memorise. Builder asks exactly as they would ask a person.'},
+    {i:'📋',t:'Category breakdown',b:'Expenses automatically grouped by material, labour, equipment, transport.'},
+    {i:'📉',t:'Remaining balance',b:'Builder knows how much headroom is left before a project goes over budget.'},
+    {i:'🕐',t:'Always up to date',b:'Every WhatsApp expense updates the budget instantly.'}
+  ],
+  steps:[
+    {d:700,t:'out',tx:'How much have I spent on Indiranagar this month?',tm:'14:10'},
+    {d:1100,t:'typ'},{d:2700,t:'htyp'},
+    {d:2800,t:'in',tx:'📊 *Budget — Indiranagar*\n\n  Material:     ₹45,000\n  Labour:       ₹32,000\n  Transport:     ₹8,500\n  Misc:          ₹4,200\n\n────────────────\nBudget:      ₹5,00,000\nSpent:         ₹89,700\nRemaining: ₹4,10,300',tm:'14:10'},
+    {d:3500,t:'l',i:0},{d:3900,t:'l',i:1},{d:4300,t:'l',i:2},{d:4700,t:'l',i:3}
+  ]
+},
+{
+  pill:'Feature 2 — Client Communication',
+  title:'Send a site update — client gets a link',
+  sub:'Builder sends a photo to the bot. Client receives a clean WhatsApp notification with a link, not a raw file',
+  cards:[
+    {i:'📤',t:'Builder sends to bot',b:'One message — bot finds the client\'s number from the project automatically.'},
+    {i:'🔔',t:'Client gets a link, not a file',b:'A professional notification card with a link to view the update on BuildTrack.'},
+    {i:'☁️',t:'File backed up permanently',b:'Photo saved to Cloudinary before forwarding. Never expires, unlike WhatsApp.'},
+    {i:'✅',t:'Delivery confirmed',b:'Builder gets confirmation and knows the client has been notified.'}
+  ],
+  steps:[
+    {d:600,t:'out',tx:'Send progress update to Client Sharma — Indiranagar',tm:'15:45'},
+    {d:1000,t:'typ'},{d:2100,t:'htyp'},
+    {d:2200,t:'in',tx:'Got it. Please send the photo or document to forward to Sharma.',tm:'15:45'},
+    {d:3000,t:'photo',cap:'Site progress — Apr 12',tm:'15:46'},
+    {d:3600,t:'typ'},{d:4900,t:'htyp'},
+    {d:5000,t:'in',tx:'✅ Sharma has been notified with a link to view this update.',tm:'15:46'},
+    {d:5600,t:'switch',nm:'Sharma (Client)',av:'S',st:'+91 98765 43210'},
+    {d:6000,t:'notif',tm:'15:46'},
+    {d:6800,t:'l',i:0},{d:7200,t:'l',i:1},{d:7600,t:'l',i:2},{d:8000,t:'l',i:3}
+  ]
+},
+{
+  pill:'Feature 2 — Client Communication',
+  title:'Request a document — client replies with PDF',
+  sub:'Builder asks the bot for Reddy\'s floor plan. Reddy gets a WhatsApp message and replies. Builder is notified automatically',
+  cards:[
+    {i:'📤',t:'Builder requests',b:'One message to the bot — it contacts the right client automatically.'},
+    {i:'💬',t:'Client gets a clear message',b:'Reddy receives a professional WhatsApp request on the contractor\'s behalf.'},
+    {i:'📥',t:'Client replies with the file',b:'Reddy sends the PDF in WhatsApp — no email, no portal login required.'},
+    {i:'🔔',t:'Builder notified immediately',b:'Builder gets the file and a permanent Cloudinary link in seconds.'}
+  ],
+  steps:[
+    {d:600,t:'out',tx:'Ask client Reddy for the floor plan',tm:'16:20'},
+    {d:1000,t:'typ'},{d:2100,t:'htyp'},
+    {d:2200,t:'in',tx:'Message sent to Reddy. I will notify you when they send the file.',tm:'16:20'},
+    {d:3100,t:'switch',nm:'Reddy (Client)',av:'R',st:'+91 99887 76655'},
+    {d:3500,t:'in',tx:'Hello Reddy,\n\nYour contractor *Rajesh Kumar* needs your *floor plan* for the Indiranagar project.\n\nPlease reply to this message with the file. Thank you 🙏',tm:'16:20'},
+    {d:4900,t:'doc',nm:'FloorPlan_v2.pdf',sz:'2.4 MB',tm:'16:22'},
+    {d:5500,t:'typ'},{d:6700,t:'htyp'},
+    {d:6800,t:'in',tx:'✅ Sent to Rajesh Kumar. Thank you!',tm:'16:22'},
+    {d:7500,t:'switch',nm:'Construction Bot',av:'🤖',st:'online'},
+    {d:7900,t:'in',tx:'✅ Reddy sent the *floor plan*.\n\nFile saved at:\nbuildtrack.in/files/reddy/\nFloorPlan_v2.pdf',tm:'16:22'},
+    {d:8600,t:'l',i:0},{d:9000,t:'l',i:1},{d:9400,t:'l',i:2},{d:9800,t:'l',i:3}
+  ]
+},
+{
+  pill:'Feature 2 — Client Communication',
+  title:'Request a milestone payment from client',
+  sub:'Builder asks the bot to send Sharma a payment request. Sharma gets a structured WhatsApp card with amount and a pay button',
+  cards:[
+    {i:'💳',t:'Builder requests payment',b:'One message — client name, amount, and milestone. Bot does the rest.'},
+    {i:'🔔',t:'Client gets a payment card',b:'A clean WhatsApp message showing amount due, milestone and a Pay Now button.'},
+    {i:'📲',t:'Client pays via UPI',b:'Client taps the link and pays with any UPI app. No bank details needed.'},
+    {i:'✅',t:'Builder notified on receipt',b:'Bot confirms payment and logs it against the project milestone automatically.'}
+  ],
+  steps:[
+    {d:600,t:'out',tx:'Send payment request to Sharma — ₹75,000 for first floor slab milestone',tm:'09:30'},
+    {d:1000,t:'typ'},{d:2200,t:'htyp'},
+    {d:2300,t:'in',tx:'Payment request will be sent to Sharma now.',tm:'09:30'},
+    {d:3000,t:'switch',nm:'Sharma (Client)',av:'S',st:'+91 98765 43210'},
+    {d:3400,t:'payreq',tm:'09:31'},
+    {d:4800,t:'switch',nm:'Construction Bot',av:'🤖',st:'online'},
+    {d:5200,t:'out',tx:'Has Sharma paid the first floor slab amount?',tm:'10:45'},
+    {d:5600,t:'typ'},{d:6900,t:'htyp'},
+    {d:7000,t:'in',tx:'✅ *Payment Confirmed*\n\nClient: Sharma\nAmount: ₹75,000\nMilestone: First floor slab\nPaid via: UPI · 10:42 AM\n\nNext due: ₹75,000\n(Roof slab — est. Jul 10)',tm:'10:45'},
+    {d:7700,t:'l',i:0},{d:8100,t:'l',i:1},{d:8500,t:'l',i:2},{d:8900,t:'l',i:3}
+  ]
+}
+];
+
+let cur=0,timers=[],playing=false,totalDur=0,pTimer=null,elapsed=0;
+
+function loadScene(idx){
+  stopAll();cur=idx;playing=false;elapsed=0;
+  document.querySelectorAll('.scbtn').forEach((b,i)=>b.classList.toggle('active',i===idx));
+  const s=S[idx];
+  document.getElementById('scpill').textContent=s.pill;
+  document.getElementById('sctitle').textContent=s.title;
+  document.getElementById('scsub').textContent=s.sub;
+  setPhone('🤖','Construction Bot','online');
+  document.getElementById('wamsgs').innerHTML='<div class="dtdiv"><span>Today</span></div><div class="typbl" id="typbl"><div class="td"></div><div class="td"></div><div class="td"></div></div>';
+  const ip=document.getElementById('ipanel');
+  ip.innerHTML='<div class="sublabel">What\'s happening</div>';
+  s.cards.forEach((c,i)=>{const d=document.createElement('div');d.className='icard';d.id='ic'+i;d.innerHTML=`<div class="icard-ic">${c.i}</div><div class="icard-ti">${c.t}</div><div class="icard-bd">${c.b}</div>`;ip.appendChild(d);});
+  totalDur=Math.max(...s.steps.map(st=>st.d))+2000;
+  document.getElementById('cfill').style.width='0%';
+  document.getElementById('clbl').textContent=(idx+1)+' / '+S.length;
+  document.getElementById('playBtn').textContent='▶';
+}
+function togglePlay(){if(playing){stopAll();document.getElementById('playBtn').textContent='▶';playing=false;}else playScene();}
+function playScene(){
+  stopAll();playing=true;document.getElementById('playBtn').textContent='⏸';
+  const s=S[cur];elapsed=0;
+  s.steps.forEach(st=>{const t=setTimeout(()=>doStep(st),st.d);timers.push(t);});
+  timers.push(setTimeout(()=>{playing=false;document.getElementById('playBtn').textContent='▶';document.getElementById('cfill').style.width='100%';stopProg();},totalDur));
+  startProg();
+}
+function startProg(){stopProg();const st=Date.now()-elapsed;pTimer=setInterval(()=>{elapsed=Date.now()-st;const p=Math.min((elapsed/totalDur)*100,100);document.getElementById('cfill').style.width=p+'%';if(p>=100)stopProg();},50);}
+function stopProg(){if(pTimer){clearInterval(pTimer);pTimer=null;}}
+function stopAll(){timers.forEach(clearTimeout);timers=[];stopProg();hideTyp();}
+function prevSc(){loadScene(Math.max(0,cur-1));}
+function nextSc(){loadScene(Math.min(S.length-1,cur+1));}
+function setPhone(av,nm,st){document.getElementById('waav').textContent=av;document.getElementById('wanm').textContent=nm;document.getElementById('wast').textContent=st;}
+function doStep(s){
+  const msgs=document.getElementById('wamsgs');
+  switch(s.t){
+    case 'typ':{const b=document.getElementById('typbl');if(b)b.classList.add('vis');scrollB();break;}
+    case 'htyp':hideTyp();break;
+    case 'out':case 'in':{
+      hideTyp();const out=s.t==='out';
+      const d=document.createElement('div');d.className='msg '+(out?'out':'in');
+      d.innerHTML=`<div class="bbl">${fmt(s.tx)}</div><div class="msgt">${s.tm}${out?' <span class="tck">✓✓</span>':''}</div>`;
+      ins(d);requestAnimationFrame(()=>d.classList.add('vis'));scrollB();break;
+    }
+    case 'voice':{
+      const bars=Array.from({length:18},(_,i)=>`<div class="vbar" style="height:${[8,12,16,22,14,18,24,18,12,16,22,16,12,18,14,10,16,12][i]||10}px"></div>`).join('');
+      const d=document.createElement('div');d.className='msg out';
+      d.innerHTML=`<div class="voi-bbl"><div class="vplay">▶</div><div class="vwave">${bars}</div><div class="vdur">${s.dur}</div></div><div class="msgt">${s.tm} <span class="tck">✓✓</span></div>`;
+      ins(d);requestAnimationFrame(()=>d.classList.add('vis'));scrollB();break;
+    }
+    case 'doc':{
+      const d=document.createElement('div');d.className='msg out';
+      d.innerHTML=`<div class="doc-bbl"><div class="doc-ic">📄</div><div><div class="doc-nm">${s.nm}</div><div class="doc-sz">${s.sz} · PDF</div></div></div><div class="msgt">${s.tm} <span class="tck">✓✓</span></div>`;
+      ins(d);requestAnimationFrame(()=>d.classList.add('vis'));scrollB();break;
+    }
+    case 'photo':{
+      const d=document.createElement('div');d.className='msg out';
+      d.innerHTML=`<div style="width:160px;height:115px;border-radius:7px;border-top-right-radius:2px;background:linear-gradient(135deg,#d4a373,#c8b99a);display:flex;align-items:center;justify-content:center;font-size:28px;position:relative;box-shadow:0 1px 2px rgba(0,0,0,.07)">🏗️<div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.38);color:#fff;font-size:9px;padding:3px 7px;border-radius:0 0 7px 7px">${s.cap}</div></div><div class="msgt">${s.tm} <span class="tck">✓✓</span></div>`;
+      ins(d);requestAnimationFrame(()=>d.classList.add('vis'));scrollB();break;
+    }
+    case 'notif':{
+      const d=document.createElement('div');d.className='msg in';
+      d.innerHTML=`<div class="lnk-bbl"><div class="lnk-prev">🏗️</div><div class="lnk-body"><div class="lnk-site">buildtrack.in</div><div class="lnk-title">New update from your contractor, Rajesh Kumar</div><div class="lnk-url">buildtrack.in/client/sharma/updates/apr-12</div></div></div><div class="msgt">${s.tm}</div>`;
+      ins(d);requestAnimationFrame(()=>d.classList.add('vis'));scrollB();break;
+    }
+    case 'payreq':{
+      const d=document.createElement('div');d.className='msg in';
+      d.innerHTML=`<div class="pay-bbl"><div class="pay-hd"><span class="pay-hd-ic">💳</span><span class="pay-hd-tx">Payment Request — Rajesh Kumar</span></div><div class="pay-bd"><div class="pay-am">₹75,000</div><div class="pay-ds">Milestone: First floor slab completion<br>Project: Indiranagar Residence</div></div><button class="pay-btn-el">Pay Now →</button><div class="pay-due">Due by Apr 25, 2025</div></div><div class="msgt">${s.tm}</div>`;
+      ins(d);requestAnimationFrame(()=>d.classList.add('vis'));scrollB();break;
+    }
+    case 'switch':{
+      setPhone(s.av,s.nm,s.st);
+      const d=document.createElement('div');d.className='dtdiv';d.innerHTML=`<span>📱 ${s.nm}</span>`;
+      ins(d);scrollB();break;
+    }
+    case 'l':{const c=document.getElementById('ic'+s.i);if(c)c.classList.add('lit');break;}
+  }
+}
+function ins(el){const t=document.getElementById('typbl');document.getElementById('wamsgs').insertBefore(el,t);}
+function hideTyp(){const b=document.getElementById('typbl');if(b)b.classList.remove('vis');}
+function scrollB(){const m=document.getElementById('wamsgs');setTimeout(()=>m.scrollTop=m.scrollHeight,50);}
+function fmt(t){return t.replace(/\*(.*?)\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');}
+function ctab(el,sec){
+  document.querySelectorAll('#page-client .gtab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  ['c-progress','c-docs','c-payments'].forEach(id=>{
+    const e=document.getElementById(id);if(e)e.style.display=id===sec?'block':'none';
+  });
+}
+loadScene(0);
+</script>
+
+<!-- ══ PAGE: AI LEAD GEN ══════════════════════════════════════════ -->
+<div class="page active" id="page-leadgen">
+
+  <div class="lg-subnav">
+    <div class="lg-subnav-left">
+      <button class="lg-subtab active" id="st-web" onclick="lgSwitch('web')">🌐 &nbsp;Website Chatbot</button>
+      <button class="lg-subtab" id="st-insta" onclick="lgSwitch('insta')">📸 &nbsp;Instagram → WhatsApp</button>
+    </div>
+    <div style="font-size:11px;color:var(--ink3)">AI lead capture — <span style="color:var(--ink);font-weight:600">prospect to site visit, automatically</span></div>
+  </div>
+
+  <div class="lg-body">
+
+    <!-- SCENARIO 1: WEBSITE CHAT -->
+    <div class="lg-scenario active" id="lg-web">
+      <div class="sc-content-row">
+      <div class="sc-left">
+        <div style="width:420px;max-width:100%">
+          <div class="laptop-wrap">
+            <div class="laptop-shell">
+              <div class="lt-bar">
+                <div class="lt-dot lt-d1"></div><div class="lt-dot lt-d2"></div><div class="lt-dot lt-d3"></div>
+                <div class="lt-url"><span style="font-size:9px;color:var(--accent)">🔒</span><span class="lt-url-txt">rajeshconstructions.in</span></div>
+              </div>
+              <div class="lt-viewport">
+                <div class="site-chrome"><div class="site-logo-sm">Rajesh Constructions</div><div class="site-nav-sm"><span>Projects</span><span>Services</span><span>Contact</span></div></div>
+                <div class="site-hero-sm"><h2>Build Your Dream Home<br>in Bangalore</h2><p>Premium G+2 construction. Transparent pricing since 2009.</p><button class="site-cta-sm">Get Free Estimate →</button></div>
+                <div class="site-cards-sm">
+                  <div class="site-card-sm"><div class="site-card-ic-sm">🏗️</div><div class="site-card-t-sm">Construction</div></div>
+                  <div class="site-card-sm"><div class="site-card-ic-sm">🎨</div><div class="site-card-t-sm">Interiors</div></div>
+                  <div class="site-card-sm"><div class="site-card-ic-sm">📐</div><div class="site-card-t-sm">Architecture</div></div>
+                </div>
+                <div class="chat-fab-wrap">
+                  <div class="chat-hint-bbl" id="webHint">👋 Get a free estimate!</div>
+                  <div class="web-chatwin" id="webChatWin">
+                    <div class="wch-head"><div class="wch-head-nm">🤖 BuildBot AI</div><div class="wch-head-sub">Replies instantly</div></div>
+                    <div class="wch-msgs" id="wchMsgs"><div class="wch-typing" id="wchTyping"><div class="wch-td"></div><div class="wch-td"></div><div class="wch-td"></div></div></div>
+                    <div class="wch-input-bar"><div class="wch-inp">Type a message...</div><div class="wch-send">→</div></div>
+                  </div>
+                  <div class="chat-fab-btn"><div class="chat-fab-ring"></div>💬</div>
+                </div>
+              </div>
+            </div>
+            <div class="laptop-base"></div>
+            <div class="laptop-stand"><div class="laptop-stand-body"></div></div>
+            <div class="laptop-foot"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sc-right">
+        <div class="sc-right-head"><div class="sc-right-label">AI Output</div><div class="sc-right-title">Generated for this lead</div></div>
+        <div class="sc-right-body" id="webOutput"><div style="text-align:center;padding:24px 0;color:var(--ink3);font-size:12px;line-height:1.7">Press <strong style="color:var(--ink)">▶ Play</strong> below<br>to watch the flow live</div></div>
+        <div class="sc-play-strip">
+          <div class="sc-play-meta">Visitor → <span>Estimate</span> → <span>Site visit</span></div>
+          <button class="btn btn-p btn-sm" id="playWebBtn" onclick="runWeb()">▶ Play</button>
+        </div>
+      </div>
+      </div>
+      <div class="lg-log-bar" id="webLogBar"><div class="lg-log-entry">System ready · awaiting visitor interaction</div></div>
+    </div>
+
+    <!-- SCENARIO 2: INSTAGRAM → WHATSAPP -->
+    <div class="lg-scenario" id="lg-insta">
+      <div class="sc-content-row">
+      <div class="sc-left" style="gap:18px">
+        <div class="ig-ph">
+          <div class="ig-scr">
+            <div class="ig-notch-sm"></div>
+            <div class="ig-top"><div class="ig-brand">Instagram</div><div class="ig-top-icons">❤️ 💬 ✈️</div></div>
+            <div class="ig-stories-row">
+              <div class="ig-st"><div class="ig-st-ring"><div class="ig-st-av">🏡</div></div><div class="ig-st-nm">Your Story</div></div>
+              <div class="ig-st"><div class="ig-st-ring"><div class="ig-st-av">🎨</div></div><div class="ig-st-nm">Design</div></div>
+              <div class="ig-st"><div class="ig-st-ring"><div class="ig-st-av">🏗️</div></div><div class="ig-st-nm">Build</div></div>
+            </div>
+            <div class="ig-post-wrap">
+              <div class="ig-ad-img">
+                <div class="ig-sponsored">SPONSORED</div>
+                <svg viewBox="0 0 110 60" width="95" style="position:relative;z-index:1">
+                  <rect x="5" y="26" width="100" height="34" fill="#2d3748" rx="2" opacity=".9"/>
+                  <polygon points="5,26 55,4 105,26" fill="#1a365d" opacity=".95"/>
+                  <rect x="12" y="33" width="16" height="16" fill="#63b3ed" opacity=".8" rx="1"/>
+                  <rect x="47" y="33" width="16" height="16" fill="#63b3ed" opacity=".8" rx="1"/>
+                  <rect x="82" y="33" width="16" height="16" fill="#63b3ed" opacity=".8" rx="1"/>
+                  <rect x="41" y="44" width="12" height="16" fill="#4a5568" rx="1"/>
+                  <rect x="70" y="33" width="3" height="16" fill="#68d391" opacity=".6" rx="1"/>
+                  <rect x="75" y="33" width="3" height="16" fill="#68d391" opacity=".6" rx="1"/>
+                </svg>
+              </div>
+              <div class="ig-post-body">
+                <div class="ig-post-user"><div class="ig-post-av">R</div><span class="ig-post-nm">rajesh.constructions</span><span class="ig-post-type">· Sponsored</span></div>
+                <div class="ig-caption">🏠 Free <strong>3D concept + cost estimate</strong> for your Bangalore plot in 2 min.</div>
+                <button class="ig-cta" id="igCtaBtn">💬 Free Estimate on WhatsApp</button>
+                <div class="ig-post-note">Opens WhatsApp →</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sc-arrow" id="scArrow">
+          <div class="sc-arrow-label">Ad click</div>
+          <div class="sc-arrow-line"></div>
+          <div class="sc-arrow-tip">→</div>
+          <div class="sc-arrow-label">Opens WhatsApp</div>
+        </div>
+
+        <div class="wa-ph">
+          <div class="wa-ph-scr">
+            <div class="wa-ph-notch"></div>
+            <div class="wa-ph-bar">
+              <div class="wa-ph-av">🤖</div>
+              <div style="flex:1"><div class="wa-ph-nm">BuildBot AI</div><div class="wa-ph-sub">online</div></div>
+              <div class="wa-ph-icons">📹 📞 ⋮</div>
+            </div>
+            <div class="wa-ph-msgs" id="waMsgs2">
+              <div style="text-align:center;margin:4px 0"><span style="background:rgba(0,0,0,.1);color:#666;font-size:8px;padding:2px 8px;border-radius:5px">Today</span></div>
+              <div class="wa-ph-typing" id="waTyping2"><div class="wa-ph-td"></div><div class="wa-ph-td"></div><div class="wa-ph-td"></div></div>
+            </div>
+            <div class="wa-ph-bot">
+              <div style="font-size:13px;color:#aaa">😊</div>
+              <div class="wa-ph-inp">Message</div>
+              <div style="font-size:13px;color:#aaa">📎</div>
+              <div class="wa-ph-send">🎤</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sc-right">
+        <div class="sc-right-head"><div class="sc-right-label">AI Output</div><div class="sc-right-title">Delivered via WhatsApp</div></div>
+        <div class="sc-right-body" id="instaOutput"><div style="text-align:center;padding:24px 0;color:var(--ink3);font-size:12px;line-height:1.7">Press <strong style="color:var(--ink)">▶ Play</strong> below<br>to simulate the flow</div></div>
+        <div class="sc-play-strip">
+          <div class="sc-play-meta">Instagram → <span>WhatsApp</span> → <span>Booked</span></div>
+          <button class="btn btn-p btn-sm" id="playInstaBtn" onclick="runInsta()" style="background:var(--blue-mid)">▶ Play</button>
+        </div>
+      </div>
+      </div>
+      <div class="lg-log-bar" id="instaLogBar"><div class="lg-log-entry">Instagram webhook · listening for ad_click events...</div></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ── LEAD GEN JS ────────────────────────────────────── */
+const delay=ms=>new Promise(r=>setTimeout(r,ms));
+function lgFmt(t){return t.replace(/\*(.*?)\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')}
+
+function lgSwitch(which){
+  document.getElementById('st-web').classList.toggle('active',which==='web');
+  document.getElementById('st-insta').classList.toggle('active',which==='insta');
+  document.getElementById('lg-web').classList.toggle('active',which==='web');
+  document.getElementById('lg-insta').classList.toggle('active',which==='insta');
+}
+
+/* ── SCENARIO 1: WEBSITE ─────────────────────────── */
+let webRunning=false;
+async function runWeb(){
+  if(webRunning)return;
+  webRunning=true;
+  const btn=document.getElementById('playWebBtn');
+  btn.disabled=true;btn.textContent='⏳';
+
+  // Reset
+  document.getElementById('webOutput').innerHTML='';
+  document.getElementById('wchMsgs').innerHTML='<div class="wch-typing" id="wchTyping"><div class="wch-td"></div><div class="wch-td"></div><div class="wch-td"></div></div>';
+  document.getElementById('webChatWin').classList.remove('open');
+  document.getElementById('webHint').classList.remove('show');
+  webLog('System ready · visitor detected on homepage');
+
+  await delay(800);
+  document.getElementById('webHint').classList.add('show');
+  await delay(1100);
+  document.getElementById('webChatWin').classList.add('open');
+  await delay(500);
+
+  wcT(true); await delay(1400); wcT(false);
+  wcM('in','👋 Welcome! I\'m BuildBot AI.\n\nI can generate a *free 3D concept + cost estimate* for your plot — right now, no signup needed.\n\nWhat\'s your plot size?');
+  webLog('Bot greeted visitor');
+  await delay(2000);
+
+  wcM('out','30x40, East facing in Indiranagar');
+  webLog('Input: plot=30x40 facing=East location=Indiranagar');
+  await delay(900);
+  wcT(true); await delay(1300); wcT(false);
+  wcM('in','Perfect — East-facing 30x40 is ideal for G+2 with great vastu.\n\nWhat style do you prefer?\n• Modern Contemporary\n• Traditional\n• Minimalist');
+  await delay(1900);
+
+  wcM('out','Modern contemporary, big windows, wood finish');
+  webLog('Style: MODERN_CONTEMPORARY + LARGE_WINDOWS + WOOD_FINISH');
+  await delay(700);
+  webLog('warn','→ Calling Gemini Estimator API...');
+  wcT(true);
+  await delay(700); webLog('→ Calling Stable Diffusion render pipeline...');
+  await delay(800); webLog('success','✓ Estimate: ₹1.2Cr–₹1.4Cr');
+  await delay(600); webLog('success','✓ 3D render ready · PDF compiled');
+  wcT(false);
+
+  wcM('in','✨ Done! Here\'s your personalised result:\n\n*G+2 on 30×40 = ₹1.2Cr – ₹1.4Cr*\n\nYour full PDF report is ready 👇');
+  await delay(500);
+  showWebPDF();
+  await delay(700);
+  wcM('in','Would you like a *free site visit* with our chief engineer?');
+  await delay(1800);
+  wcM('out','Yes! This weekend works.');
+  await delay(700);
+  webLog('success','✓ SITE_VISIT_REQUESTED · booking confirmed');
+  wcT(true); await delay(1100); wcT(false);
+  wcM('in','✅ *Booked!* Our engineer will call you Friday to confirm timing. See you this weekend! 🏠');
+  await delay(400);
+  showWebBooking();
+  webLog('success','✓ Lead qualified · CRM updated · site visit booked');
+
+  btn.disabled=false;btn.textContent='↺ Replay';
+  webRunning=false;
+}
+
+function wcT(show){const t=document.getElementById('wchTyping');if(t)t.classList.toggle('show',show);if(show)scrollWC();}
+function wcM(dir,text){
+  const msgs=document.getElementById('wchMsgs');
+  const t=document.getElementById('wchTyping');
+  const d=document.createElement('div');
+  d.className='wch-bbl '+(dir==='out'?'wch-out':'wch-in');
+  d.innerHTML=lgFmt(text);
+  msgs.insertBefore(d,t);scrollWC();
+}
+function scrollWC(){const m=document.getElementById('wchMsgs');setTimeout(()=>m.scrollTop=m.scrollHeight,50);}
+function webLog(msg){
+  const el=document.getElementById('webLogBar');
+  const ok=msg.includes('✓');const warn=msg.includes('→')||msg.startsWith('warn');
+  el.innerHTML=`<div class="lg-log-entry ${ok?'success':warn?'warn':''}">${msg.replace(/^warn,?/,'')}</div>`;
+}
+
+const HOUSE_SVG=`<svg viewBox="0 0 130 80" xmlns="http://www.w3.org/2000/svg" style="position:relative;z-index:1">
+  <rect x="5" y="36" width="120" height="44" fill="#2d3748" rx="3" opacity=".9"/>
+  <polygon points="5,36 65,5 125,36" fill="#1a365d" opacity=".95"/>
+  <rect x="15" y="45" width="22" height="24" fill="#63b3ed" opacity=".75" rx="1"/>
+  <rect x="54" y="45" width="22" height="24" fill="#63b3ed" opacity=".75" rx="1"/>
+  <rect x="93" y="45" width="22" height="24" fill="#63b3ed" opacity=".75" rx="1"/>
+  <rect x="49" y="60" width="16" height="20" fill="#4a5568" rx="1"/>
+  <rect x="15" y="47" width="5" height="3" fill="#90cdf4" opacity=".6"/>
+  <rect x="22" y="47" width="5" height="3" fill="#90cdf4" opacity=".6"/>
+  <rect x="83" y="45" width="5" height="22" fill="#68d391" opacity=".5" rx="1"/>
+  <rect x="90" y="45" width="5" height="22" fill="#68d391" opacity=".5" rx="1"/>
+  <rect x="100" y="47" width="5" height="3" fill="#90cdf4" opacity=".6"/>
+  <rect x="107" y="47" width="5" height="3" fill="#90cdf4" opacity=".6"/>
+</svg>`;
+
+function showWebPDF(){
+  const out=document.getElementById('webOutput');
+  out.innerHTML='';
+  const c=document.createElement('div');c.className='out-card';
+  c.innerHTML=`
+    <div class="render-card-img"><div class="render-card-tag">✨ AI Render</div>${HOUSE_SVG}</div>
+    <div class="cost-head"><div class="cost-head-title">📄 Cost Sheet — 30×40 East</div><div class="cost-head-sub">G+2 Premium Finish · AI Estimated</div></div>
+    <div class="cost-body">
+      <div class="cost-row"><span class="cost-row-label">Structural (RCC)</span><span class="cost-row-val">₹52,00,000</span></div>
+      <div class="cost-row"><span class="cost-row-label">Brick & masonry</span><span class="cost-row-val">₹14,00,000</span></div>
+      <div class="cost-row"><span class="cost-row-label">Flooring & tiling</span><span class="cost-row-val">₹9,60,000</span></div>
+      <div class="cost-row"><span class="cost-row-label">Electrical & MEP</span><span class="cost-row-val">₹8,40,000</span></div>
+      <div class="cost-row"><span class="cost-row-label">Doors & windows</span><span class="cost-row-val">₹7,20,000</span></div>
+      <div class="cost-row"><span class="cost-row-label">Wood interiors</span><span class="cost-row-val">₹18,80,000</span></div>
+      <div class="cost-total"><span class="cost-total-label">Total Estimate</span><span class="cost-total-val">₹1.2–1.4 Cr</span></div>
+    </div>
+    <div class="cost-dl">⬇ Download PDF Report</div>
+  `;
+  out.appendChild(c);requestAnimationFrame(()=>c.classList.add('show'));
+}
+
+function showWebBooking(){
+  const out=document.getElementById('webOutput');
+  const c=document.createElement('div');c.className='booking-out-card';
+  c.innerHTML=`
+    <div class="booking-out-title">✅ Site Visit Confirmed</div>
+    <div class="booking-out-items">
+      <div class="booking-out-item">Lead saved to builder CRM</div>
+      <div class="booking-out-item">WhatsApp confirmation sent</div>
+      <div class="booking-out-item">Engineer assigned for weekend</div>
+      <div class="booking-out-item">PDF report emailed to lead</div>
+    </div>
+  `;
+  out.appendChild(c);requestAnimationFrame(()=>c.classList.add('show'));
+}
+
+/* ── SCENARIO 2: INSTAGRAM ───────────────────────── */
+let instaRunning=false;
+async function runInsta(){
+  if(instaRunning)return;
+  instaRunning=true;
+  const btn=document.getElementById('playInstaBtn');
+  btn.disabled=true;btn.textContent='⏳';
+
+  document.getElementById('instaOutput').innerHTML='';
+  document.getElementById('waMsgs2').innerHTML='<div style="text-align:center;margin:4px 0"><span style="background:rgba(0,0,0,.1);color:#666;font-size:8px;padding:2px 8px;border-radius:5px">Today</span></div><div class="wa-ph-typing" id="waTyping2"><div class="wa-ph-td"></div><div class="wa-ph-td"></div><div class="wa-ph-td"></div></div>';
+  document.getElementById('scArrow').classList.remove('show');
+  instaLog('Instagram webhook · listening for ad_click events...');
+
+  await delay(900);
+  const igBtn=document.getElementById('igCtaBtn');
+  igBtn.style.transform='scale(.95)';igBtn.style.opacity='.6';
+  instaLog('warn','⚡ Ad click received · UTM: instagram_feed_bangalore');
+  await delay(400);
+  igBtn.style.transform='';igBtn.style.opacity='';
+  document.getElementById('scArrow').classList.add('show');
+  await delay(500);
+  instaLog('Redirecting to WhatsApp · pre-populating greeting...');
+  await delay(500);
+
+  waT2(true); instaLog('success','✓ WhatsApp session opened · bot triggered');
+  await delay(1700); waT2(false);
+  waM2('in','👋 Hi! Thanks for your interest in Rajesh Constructions!\n\nI can give you a *free 3D concept + cost estimate* for your plot in 2 minutes.\n\nWhat\'s your plot size?');
+
+  await delay(2200);
+  waM2('out','30x40 plot, East facing, HSR Layout');
+  instaLog('Lead: plot=30x40 facing=East location=HSR_Layout');
+  await delay(800);
+  waT2(true); await delay(1300); waT2(false);
+  waM2('in','HSR Layout is one of our most active areas!\n\nWhat style do you prefer?\n• Modern Contemporary\n• Traditional / Vastu\n• Minimalist');
+  await delay(2000);
+
+  waM2('out','Modern contemporary. Clean lines, big windows.');
+  instaLog('warn','→ AI pipeline: Gemini Estimator + Stable Diffusion...');
+  await delay(600);
+  waT2(true);
+  await delay(900); instaLog('Gemini → ₹1.15Cr–₹1.35Cr · Render: 2.3s');
+  await delay(900); instaLog('success','✓ PDF + 3D render ready · sending via WhatsApp');
+  await delay(400); waT2(false);
+
+  waRender2();
+  await delay(400);
+  waM2('in','Here\'s your personalised result! 🎉\n\n*G+2 on 30×40 HSR Layout*\n💰 *₹1.15Cr – ₹1.35Cr* (premium finish)\n\nWant to book a *free site visit*?');
+
+  await delay(400); showInstaOutputs();
+  await delay(1900);
+  waM2('out','Yes! Saturday morning works for me.');
+  instaLog('success','✓ SITE_VISIT_REQUESTED · Saturday slot confirmed');
+  await delay(600);
+  waT2(true); await delay(1100); waT2(false);
+  waM2('in','✅ *Saturday confirmed!* Our engineer will call you Friday to fix the time. See you soon! 🏠');
+  showInstaBooking();
+  instaLog('success','✓ Lead: HIGH intent · CRM updated · site visit Saturday');
+
+  btn.disabled=false;btn.textContent='↺ Replay';
+  instaRunning=false;
+}
+
+function waT2(show){const t=document.getElementById('waTyping2');if(t)t.classList.toggle('vis',show);if(show)scrollWA2();}
+function waM2(dir,text){
+  const msgs=document.getElementById('waMsgs2');
+  const t=document.getElementById('waTyping2');
+  const d=document.createElement('div');
+  d.className='wa-m-wrap '+dir;
+  const now=new Date();const ts=now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
+  d.innerHTML=`<div class="wa-m-bbl">${lgFmt(text)}</div><div class="wa-m-ts">${ts}${dir==='out'?' <span class="wa-m-tck">✓✓</span>':''}</div>`;
+  msgs.insertBefore(d,t);requestAnimationFrame(()=>d.classList.add('vis'));scrollWA2();
+}
+function waRender2(){
+  const msgs=document.getElementById('waMsgs2');const t=document.getElementById('waTyping2');
+  const d=document.createElement('div');d.className='wa-render-wrap';
+  d.innerHTML=`
+    <div class="wa-render-img">
+      <div class="wa-render-tag">✨ AI Render</div>
+      <svg viewBox="0 0 110 62" width="120" style="position:relative;z-index:1">
+        <rect x="5" y="27" width="100" height="35" fill="#2d3748" rx="2" opacity=".9"/>
+        <polygon points="5,27 55,5 105,27" fill="#1a365d" opacity=".95"/>
+        <rect x="12" y="34" width="16" height="16" fill="#63b3ed" opacity=".8" rx="1"/>
+        <rect x="47" y="34" width="16" height="16" fill="#63b3ed" opacity=".8" rx="1"/>
+        <rect x="82" y="34" width="16" height="16" fill="#63b3ed" opacity=".8" rx="1"/>
+        <rect x="41" y="45" width="12" height="17" fill="#4a5568" rx="1"/>
+        <rect x="70" y="34" width="3" height="16" fill="#68d391" opacity=".6" rx="1"/>
+        <rect x="75" y="34" width="3" height="16" fill="#68d391" opacity=".6" rx="1"/>
+      </svg>
+    </div>
+    <div class="wa-render-txt">Your *30×40 Modern Contemporary* concept is ready. Tap to view full render →</div>
+  `;
+  msgs.insertBefore(d,t);requestAnimationFrame(()=>d.classList.add('vis'));scrollWA2();
+}
+function scrollWA2(){const m=document.getElementById('waMsgs2');setTimeout(()=>m.scrollTop=m.scrollHeight,50);}
+function instaLog(msg){
+  const el=document.getElementById('instaLogBar');
+  const ok=msg.includes('✓');const warn=msg.includes('⚡')||msg.includes('→');
+  el.innerHTML=`<div class="lg-log-entry ${ok?'success':warn?'warn':''}">${msg.replace(/^warn,?/,'')}</div>`;
+}
+
+function showInstaOutputs(){
+  const out=document.getElementById('instaOutput');out.innerHTML='';
+  const r=document.createElement('div');r.className='out-card';
+  r.innerHTML=`
+    <div class="render-card-img">
+      <div class="render-card-tag">✨ AI Generated</div>
+      <svg viewBox="0 0 110 62" width="110" style="position:relative;z-index:1">
+        <rect x="5" y="27" width="100" height="35" fill="#2d3748" rx="2" opacity=".9"/>
+        <polygon points="5,27 55,5 105,27" fill="#1a365d"/>
+        <rect x="12" y="34" width="16" height="16" fill="#63b3ed" opacity=".8" rx="1"/>
+        <rect x="47" y="34" width="16" height="16" fill="#63b3ed" opacity=".8" rx="1"/>
+        <rect x="82" y="34" width="16" height="16" fill="#63b3ed" opacity=".8" rx="1"/>
+        <rect x="41" y="45" width="12" height="17" fill="#4a5568" rx="1"/>
+        <rect x="70" y="34" width="3" height="16" fill="#68d391" opacity=".6" rx="1"/>
+        <rect x="75" y="34" width="3" height="16" fill="#68d391" opacity=".6" rx="1"/>
+      </svg>
+    </div>
+    <div class="render-card-footer"><div><div class="render-card-label">3D Facade · 30×40 HSR</div><div class="render-card-sub">Modern Contemporary</div></div><span class="bdg bdg-g" style="font-size:10px">AI Generated</span></div>
+  `;
+  out.appendChild(r);requestAnimationFrame(()=>r.classList.add('show'));
+
+  setTimeout(()=>{
+    const c=document.createElement('div');c.className='out-card';
+    c.innerHTML=`
+      <div class="cost-head"><div class="cost-head-title">📄 Cost Sheet — 30×40 HSR</div><div class="cost-head-sub">G+2 Premium · AI Estimated</div></div>
+      <div class="cost-body">
+        <div class="cost-row"><span class="cost-row-label">Structural (RCC)</span><span class="cost-row-val">₹48L</span></div>
+        <div class="cost-row"><span class="cost-row-label">Brickwork</span><span class="cost-row-val">₹12L</span></div>
+        <div class="cost-row"><span class="cost-row-label">Flooring</span><span class="cost-row-val">₹9L</span></div>
+        <div class="cost-row"><span class="cost-row-label">Electrical & MEP</span><span class="cost-row-val">₹8L</span></div>
+        <div class="cost-row"><span class="cost-row-label">Interiors & Wood</span><span class="cost-row-val">₹16L</span></div>
+        <div class="cost-total"><span class="cost-total-label">Total</span><span class="cost-total-val">₹1.15–1.35Cr</span></div>
+      </div>
+    `;
+    out.appendChild(c);requestAnimationFrame(()=>c.classList.add('show'));
+  },500);
+}
+
+function showInstaBooking(){
+  const out=document.getElementById('instaOutput');
+  const c=document.createElement('div');c.className='booking-out-card';
+  c.innerHTML=`
+    <div class="booking-out-title">🗓️ Site Visit Saturday</div>
+    <div class="booking-out-items">
+      <div class="booking-out-item">Engineer assigned · Saturday AM</div>
+      <div class="booking-out-item">WhatsApp reminder scheduled</div>
+      <div class="booking-out-item">3D render + PDF sent on chat</div>
+      <div class="booking-out-item">Lead tagged HIGH intent in CRM</div>
+    </div>
+  `;
+  out.appendChild(c);requestAnimationFrame(()=>c.classList.add('show'));
+}
+</script>
+</body>
+</html>
