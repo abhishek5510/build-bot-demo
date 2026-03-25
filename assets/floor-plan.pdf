@@ -6,37 +6,74 @@ endobj
 << /Type /Pages /Kids [3 0 R] /Count 1 >>
 endobj
 3 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >>
 endobj
 4 0 obj
 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
 endobj
 5 0 obj
-<< /Length 555 >>
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+6 0 obj
+<< /Length 2915 >>
 stream
-BT
-/F1 12 Tf
-1 0 0 1 50 760 Tm (BuildTrack Demo - Sample Floor Plan) Tj
-1 0 0 1 50 742 Tm (Ground Floor: Living, Kitchen, Guest Bedroom, Common Toilet) Tj
-1 0 0 1 50 724 Tm (First Floor: Master Bedroom, Kids Bedroom, Study, Balcony) Tj
-1 0 0 1 50 706 Tm (Second Floor: Terrace + Utility + Home Office) Tj
-1 0 0 1 50 688 Tm (Plot Size: 30x40, East Facing) Tj
-1 0 0 1 50 670 Tm (Setbacks: Front 5ft, Rear 3ft, Sides 2.5ft) Tj
-1 0 0 1 50 652 Tm (Parking: 1 Car + 2 Two-wheelers) Tj
-1 0 0 1 50 634 Tm (This is a representative sample for demo purposes.) Tj
-ET
+0.960 0.973 0.980 rg 0 0 595 842 re f
+0.063 0.145 0.231 rg 0 730 595 112 re f
+BT /F2 28 Tf 1 1 1 rg 1 0 0 1 36 790 Tm (Concept Floor Design Pack) Tj ET
+BT /F1 12 Tf 0.76 0.84 0.94 rg 1 0 0 1 36 768 Tm (30x40 East-facing residential concept | G+2 ready) Tj ET
+BT /F1 10 Tf 0.76 0.84 0.94 rg 1 0 0 1 36 748 Tm (Generated on 2026-03-25) Tj ET
+1 1 1 rg 28 330 539 372 re f
+0.88 0.91 0.95 RG 1.5 w 28 330 539 372 re S
+BT /F2 16 Tf 0.08 0.11 0.18 rg 1 0 0 1 44 676 Tm (Ground Floor Layout - Approx. 1200 sq.ft) Tj ET
+0.97 0.98 0.99 rg 44 370 505 280 re f
+0.58 0.63 0.72 RG 1 w 44 370 505 280 re S
+0.90 0.95 0.92 rg 52.0 540.0 200.0 100.0 re f
+0.24 0.47 0.34 RG 0.8 w 52.0 540.0 200.0 100.0 re S
+BT /F2 10 Tf 0.10 0.20 0.13 rg 1 0 0 1 60.0 590.0 Tm (Living) Tj ET
+0.90 0.95 0.92 rg 254.0 540.0 120.0 100.0 re f
+0.24 0.47 0.34 RG 0.8 w 254.0 540.0 120.0 100.0 re S
+BT /F2 10 Tf 0.10 0.20 0.13 rg 1 0 0 1 262.0 590.0 Tm (Dining) Tj ET
+0.90 0.95 0.92 rg 376.0 540.0 165.0 100.0 re f
+0.24 0.47 0.34 RG 0.8 w 376.0 540.0 165.0 100.0 re S
+BT /F2 10 Tf 0.10 0.20 0.13 rg 1 0 0 1 384.0 590.0 Tm (Kitchen) Tj ET
+0.90 0.95 0.92 rg 52.0 428.0 170.0 105.0 re f
+0.24 0.47 0.34 RG 0.8 w 52.0 428.0 170.0 105.0 re S
+BT /F2 10 Tf 0.10 0.20 0.13 rg 1 0 0 1 60.0 480.5 Tm (Bed 1) Tj ET
+0.90 0.95 0.92 rg 224.0 428.0 150.0 105.0 re f
+0.24 0.47 0.34 RG 0.8 w 224.0 428.0 150.0 105.0 re S
+BT /F2 10 Tf 0.10 0.20 0.13 rg 1 0 0 1 232.0 480.5 Tm (Bed 2) Tj ET
+0.90 0.95 0.92 rg 376.0 428.0 90.0 105.0 re f
+0.24 0.47 0.34 RG 0.8 w 376.0 428.0 90.0 105.0 re S
+BT /F2 10 Tf 0.10 0.20 0.13 rg 1 0 0 1 384.0 480.5 Tm (Study) Tj ET
+0.90 0.95 0.92 rg 468.0 428.0 73.0 105.0 re f
+0.24 0.47 0.34 RG 0.8 w 468.0 428.0 73.0 105.0 re S
+BT /F2 10 Tf 0.10 0.20 0.13 rg 1 0 0 1 476.0 480.5 Tm (Stair) Tj ET
+BT /F1 11 Tf 0.18 0.22 0.29 rg 1 0 0 1 44 340 Tm (Design intent: Cross-ventilation, larger living area, and natural light from East frontage.) Tj ET
+1 1 1 rg 28 58 539 248 re f
+0.88 0.91 0.95 RG 1.5 w 28 58 539 248 re S
+BT /F2 15 Tf 0.08 0.11 0.18 rg 1 0 0 1 44 274 Tm (Floor Design Notes) Tj ET
+BT /F2 10 Tf 0.10 0.20 0.13 rg 1 0 0 1 46 246.0 Tm (?) Tj ET
+BT /F1 10 Tf 0.120 0.140 0.170 rg 1 0 0 1 60 246 Tm (First floor repeats utility core and adds family lounge + balcony facing East.) Tj ET
+BT /F2 10 Tf 0.10 0.20 0.13 rg 1 0 0 1 46 229.0 Tm (?) Tj ET
+BT /F1 10 Tf 0.120 0.140 0.170 rg 1 0 0 1 60 229 Tm (Second floor reserves terrace garden and solar-ready utility deck.) Tj ET
+BT /F2 10 Tf 0.10 0.20 0.13 rg 1 0 0 1 46 212.0 Tm (?) Tj ET
+BT /F1 10 Tf 0.120 0.140 0.170 rg 1 0 0 1 60 212 Tm (Window-to-wall ratio kept balanced for thermal comfort in warm climate zones.) Tj ET
+BT /F2 10 Tf 0.10 0.20 0.13 rg 1 0 0 1 46 195.0 Tm (?) Tj ET
+BT /F1 10 Tf 0.120 0.140 0.170 rg 1 0 0 1 60 195 Tm (Stair and shaft alignment kept vertical to reduce structural complexity and) Tj ET
+BT /F1 10 Tf 0.120 0.140 0.170 rg 1 0 0 1 60 182 Tm (MEP rerouting.) Tj ET
 endstream
 endobj
 xref
-0 6
+0 7
 0000000000 65535 f 
 0000000009 00000 n 
 0000000058 00000 n 
 0000000115 00000 n 
-0000000241 00000 n 
-0000000311 00000 n 
+0000000251 00000 n 
+0000000321 00000 n 
+0000000396 00000 n 
 trailer
-<< /Size 6 /Root 1 0 R >>
+<< /Size 7 /Root 1 0 R >>
 startxref
-917
+3363
 %%EOF
