@@ -1372,6 +1372,7 @@ loadScene(0);
     <div class="prod-switch">
       <button class="prod-btn active" id="prod-construction" onclick="setProduct('construction')">🏗️ Construction Product</button>
       <button class="prod-btn" id="prod-interior" onclick="setProduct('interior')">🛋️ Interior Product</button>
+      <button class="prod-btn" id="prod-appartment" onclick="setProduct('appartment')">🏢 Appartment Product</button>
     </div>
     <div class="lg-subnav-left">
       <button class="lg-subtab active" id="st-web" onclick="lgSwitch('web')">🌐 &nbsp;Website Chatbot</button>
@@ -1517,7 +1518,7 @@ loadScene(0);
           <div class="qual-row">Asks budget, timeline, and location intent questions.</div>
           <div class="qual-row">Detects decision maker vs. researcher behavior.</div>
           <div class="qual-row">Creates follow-up tasks for sales team automatically.</div>
-          <div class="qual-row">Works for both construction and interior enquiries.</div>
+          <div class="qual-row">Works for construction, interior, and appartment enquiries.</div>
           <div style="margin-top:10px"><button class="btn btn-p btn-sm" id="playQualBtn" onclick="runQualifier()">▶ Play</button></div>
         </div>
         <div class="qual-col" id="qualOutput"><div style="font-size:12px;color:var(--ink3)">Run the bot to simulate qualification scoring and lead routing.</div></div>
@@ -1534,6 +1535,56 @@ const delay=ms=>new Promise(r=>setTimeout(r,ms));
 function lgFmt(t){return t.replace(/\*(.*?)\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')}
 
 let currentProduct='construction';
+const productContent={
+  construction:{
+    tagline:'prospect to site visit, automatically',
+    url:'rajeshconstructions.in',
+    logo:'Rajesh Constructions',
+    heroTitle:'Build Your Dream Home<br>in Bangalore',
+    heroDesc:'Premium G+2 construction. Transparent pricing since 2009.',
+    igCta:'💬 Free Estimate on WhatsApp',
+    webResult:'🎉 Concept locked! Here\'s your personalised result:\n\n*G+2 on 30×40 = ₹1.2Cr – ₹1.4Cr*\n\nI\'ve bundled it into a polished PDF set 👇',
+    webAskPdf:'Can you also share floor plan PDF?',
+    webConsultPrompt:'Want me to lock a *free site visit* with our chief engineer?',
+    webQuickReplies:['Book this weekend', 'Show evening slots', 'Need callback first'],
+    webBookingReply:'Yes! This weekend works.',
+    instaResult:'Here\'s your personalised result! 🎉\n\n*G+2 on 30×40 HSR Layout*\n💰 *₹1.15Cr – ₹1.35Cr* (premium finish)\n\nWant to book a *free site visit*?',
+    qualSegment:'New home construction',
+    qualBudget:'₹1Cr+'
+  },
+  interior:{
+    tagline:'prospect to design consultation, automatically',
+    url:'studioaura-interiors.in',
+    logo:'Studio Aura Interiors',
+    heroTitle:'Design Your Dream Home<br>with Premium Interiors',
+    heroDesc:'Modular kitchens, wardrobes, and turnkey interiors with fixed pricing.',
+    igCta:'💬 Free Interior Quote',
+    webResult:'🎉 Design snapshot ready!\n\n*2BHK Interiors = ₹12L – ₹17L*\n\nI\'ve bundled it into a polished PDF set 👇',
+    webAskPdf:'Can you share a sample floor plan and BOQ PDF?',
+    webConsultPrompt:'Want me to lock a *free design consultation* with our interior designer?',
+    webQuickReplies:['Book consultation', 'Share portfolio first', 'Need callback'],
+    webBookingReply:'Yes, Sunday afternoon works.',
+    instaResult:'Here\'s your interior quote! 🎉\n\n*3BHK interiors for 1650 sq ft*\n💰 *₹14L – ₹19L* (premium finish)\n\nWant to book a *free design consultation*?',
+    qualSegment:'Interior renovation',
+    qualBudget:'₹12L+'
+  },
+  appartment:{
+    tagline:'prospect to apartment walkthrough, automatically',
+    url:'aura-appartments.in',
+    logo:'Aura Appartments',
+    heroTitle:'Own Your Dream Appartment<br>in Bangalore',
+    heroDesc:'2BHK and 3BHK premium appartments with flexible payment plans.',
+    igCta:'💬 Free Appartment Quote',
+    webResult:'🎉 Appartment options ready!\n\n*3BHK Appartment = ₹82L – ₹96L*\n\nI\'ve bundled options and costing in a PDF set 👇',
+    webAskPdf:'Can you also share the floor wise appartment layout PDF?',
+    webConsultPrompt:'Want me to lock a *free appartment walkthrough* this weekend?',
+    webQuickReplies:['Book walkthrough', 'Share tower plan first', 'Need callback'],
+    webBookingReply:'Yes, I can visit this weekend.',
+    instaResult:'Here are your appartment options! 🎉\n\n*3BHK Appartment in HSR*\n💰 *₹82L – ₹96L* (all-inclusive)\n\nWant to book a *free site walkthrough*?',
+    qualSegment:'Appartment purchase',
+    qualBudget:'₹80L+'
+  }
+};
 function lgSwitch(which){
   document.getElementById('st-web').classList.toggle('active',which==='web');
   document.getElementById('st-insta').classList.toggle('active',which==='insta');
@@ -1544,15 +1595,16 @@ function lgSwitch(which){
 }
 function setProduct(type){
   currentProduct=type;
+  const content=productContent[type]||productContent.construction;
   document.getElementById('prod-construction').classList.toggle('active',type==='construction');
   document.getElementById('prod-interior').classList.toggle('active',type==='interior');
-  const construction=type==='construction';
-  document.getElementById('productTagline').textContent=construction?'prospect to site visit, automatically':'prospect to design consultation, automatically';
-  document.querySelector('.lt-url-txt').textContent=construction?'rajeshconstructions.in':'studioaura-interiors.in';
-  document.querySelector('.site-logo-sm').textContent=construction?'Rajesh Constructions':'Studio Aura Interiors';
-  document.querySelector('.site-hero-sm h2').innerHTML=construction?'Build Your Dream Home<br>in Bangalore':'Design Your Dream Home<br>with Premium Interiors';
-  document.querySelector('.site-hero-sm p').textContent=construction?'Premium G+2 construction. Transparent pricing since 2009.':'Modular kitchens, wardrobes, and turnkey interiors with fixed pricing.';
-  document.getElementById('igCtaBtn').textContent=construction?'💬 Free Estimate on WhatsApp':'💬 Free Interior Quote';
+  document.getElementById('prod-appartment').classList.toggle('active',type==='appartment');
+  document.getElementById('productTagline').textContent=content.tagline;
+  document.querySelector('.lt-url-txt').textContent=content.url;
+  document.querySelector('.site-logo-sm').textContent=content.logo;
+  document.querySelector('.site-hero-sm h2').innerHTML=content.heroTitle;
+  document.querySelector('.site-hero-sm p').textContent=content.heroDesc;
+  document.getElementById('igCtaBtn').textContent=content.igCta;
 }
 
 /* ── SCENARIO 1: WEBSITE ─────────────────────────── */
@@ -1600,20 +1652,20 @@ async function runWeb(){
   await delay(600); webLog('success','✓ 3D render ready · PDF compiled');
   wcT(false);
 
-  wcM('in',currentProduct==='construction'?'🎉 Concept locked! Here\'s your personalised result:\n\n*G+2 on 30×40 = ₹1.2Cr – ₹1.4Cr*\n\nI\'ve bundled it into a polished PDF set 👇':'🎉 Design snapshot ready!\n\n*2BHK Interiors = ₹12L – ₹17L*\n\nI\'ve bundled it into a polished PDF set 👇');
+  wcM('in',productContent[currentProduct].webResult);
   await delay(500);
   showWebPDF();
   await delay(700);
-  wcM('out',currentProduct==='construction'?'Can you also share floor plan PDF?':'Can you share a sample floor plan and BOQ PDF?');
+  wcM('out',productContent[currentProduct].webAskPdf);
   await delay(600);
   wcM('in','Absolutely — sending the styled floor design PDF now.');
   await delay(300);
   showFloorPlanPDF();
   await delay(700);
-  wcM('in',currentProduct==='construction'?'Want me to lock a *free site visit* with our chief engineer?':'Want me to lock a *free design consultation* with our interior designer?');
-  webQuickReplies(currentProduct==='construction'?['Book this weekend', 'Show evening slots', 'Need callback first']:['Book consultation', 'Share portfolio first', 'Need callback']);
+  wcM('in',productContent[currentProduct].webConsultPrompt);
+  webQuickReplies(productContent[currentProduct].webQuickReplies);
   await delay(1800);
-  wcM('out',currentProduct==='construction'?'Yes! This weekend works.':'Yes, Sunday afternoon works.');
+  wcM('out',productContent[currentProduct].webBookingReply);
   await delay(700);
   webLog('success','✓ SITE_VISIT_REQUESTED · booking confirmed');
   wcT(true); await delay(1100); wcT(false);
@@ -1763,7 +1815,7 @@ async function runInsta(){
 
   waRender2();
   await delay(400);
-  waM2('in',currentProduct==='construction'?'Here\'s your personalised result! 🎉\n\n*G+2 on 30×40 HSR Layout*\n💰 *₹1.15Cr – ₹1.35Cr* (premium finish)\n\nWant to book a *free site visit*?':'Here\'s your interior quote! 🎉\n\n*3BHK interiors for 1650 sq ft*\n💰 *₹14L – ₹19L* (premium finish)\n\nWant to book a *free design consultation*?');
+  waM2('in',productContent[currentProduct].instaResult);
 
   await delay(400); showInstaOutputs();
   await delay(400);
@@ -1886,8 +1938,8 @@ async function runQualifier(){
   await delay(900);
   qualLog('✓ Lead replied: budget confirmed + timeline 45 days');
   out.innerHTML=`<div class="qual-row"><strong>Lead Score:</strong> 91/100 (HOT)</div>
-  <div class="qual-row"><strong>Segment:</strong> ${currentProduct==='construction'?'New home construction':'Interior renovation'}</div>
-  <div class="qual-row"><strong>Budget Band:</strong> ${currentProduct==='construction'?'₹1Cr+':'₹12L+'}</div>
+  <div class="qual-row"><strong>Segment:</strong> ${productContent[currentProduct].qualSegment}</div>
+  <div class="qual-row"><strong>Budget Band:</strong> ${productContent[currentProduct].qualBudget}</div>
   <div class="qual-row"><strong>Action:</strong> Auto-assigned to sales rep + WhatsApp follow-up in 10 mins.</div>`;
   qualLog('✓ CRM updated · task created · callback queued');
   btn.disabled=false;btn.textContent='↺ Replay';
