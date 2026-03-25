@@ -563,6 +563,16 @@ table.dt{width:100%;border-collapse:collapse}
 .booking-out-item{font-size:10.5px;color:var(--ink2);display:flex;align-items:flex-start;gap:6px;line-height:1.45}
 .booking-out-item::before{content:'✓';color:var(--accent);font-weight:700;flex-shrink:0;font-size:11px}
 
+
+.prod-switch{display:flex;gap:6px;align-items:center}
+.prod-btn{border:var(--bd);background:var(--paper);color:var(--ink2);font-size:11px;font-weight:600;padding:6px 10px;border-radius:16px}
+.prod-btn.active{background:var(--accent-light);color:var(--accent);border-color:#b6dfc8}
+.qual-wrap{padding:22px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.qual-col{background:var(--paper);border:var(--bd);border-radius:var(--rl);padding:14px}
+.qual-row{font-size:12px;color:var(--ink2);padding:7px 0;border-bottom:1px solid var(--paper3)}
+.qual-row:last-child{border-bottom:none}
+@media(max-width:900px){.qual-wrap{grid-template-columns:1fr}}
+
 /* Log bar at bottom */
 .lg-log-bar{
   height:34px;background:var(--paper);border-top:var(--bd);
@@ -1356,12 +1366,17 @@ loadScene(0);
 <!-- ══ PAGE: AI LEAD GEN ══════════════════════════════════════════ -->
 <div class="page active" id="page-leadgen">
 
-  <div class="lg-subnav">
+  <div class="lg-subnav" style="height:auto;min-height:50px;flex-wrap:wrap;gap:8px;padding-top:8px;padding-bottom:8px">
+    <div class="prod-switch">
+      <button class="prod-btn active" id="prod-construction" onclick="setProduct('construction')">🏗️ Construction Product</button>
+      <button class="prod-btn" id="prod-interior" onclick="setProduct('interior')">🛋️ Interior Product</button>
+    </div>
     <div class="lg-subnav-left">
       <button class="lg-subtab active" id="st-web" onclick="lgSwitch('web')">🌐 &nbsp;Website Chatbot</button>
       <button class="lg-subtab" id="st-insta" onclick="lgSwitch('insta')">📸 &nbsp;Instagram → WhatsApp</button>
+      <button class="lg-subtab" id="st-qual" onclick="lgSwitch('qual')">🧠 &nbsp;Lead Qualification Bot</button>
     </div>
-    <div style="font-size:11px;color:var(--ink3)">AI lead capture — <span style="color:var(--ink);font-weight:600">prospect to site visit, automatically</span></div>
+    <div style="font-size:11px;color:var(--ink3)">AI lead capture — <span style="color:var(--ink);font-weight:600" id="productTagline">prospect to site visit, automatically</span></div>
   </div>
 
   <div class="lg-body">
@@ -1492,6 +1507,22 @@ loadScene(0);
       <div class="lg-log-bar" id="instaLogBar"><div class="lg-log-entry">Instagram webhook · listening for ad_click events...</div></div>
     </div>
 
+    <div class="lg-scenario" id="lg-qual">
+      <div class="qual-wrap">
+        <div class="qual-col">
+          <div class="sc-right-label">New Lead Generation Bot</div>
+          <div class="sc-right-title" style="margin-top:4px">AI Qualification + CRM Enrichment</div>
+          <div class="qual-row">Asks budget, timeline, and location intent questions.</div>
+          <div class="qual-row">Detects decision maker vs. researcher behavior.</div>
+          <div class="qual-row">Creates follow-up tasks for sales team automatically.</div>
+          <div class="qual-row">Works for both construction and interior enquiries.</div>
+          <div style="margin-top:10px"><button class="btn btn-p btn-sm" id="playQualBtn" onclick="runQualifier()">▶ Play</button></div>
+        </div>
+        <div class="qual-col" id="qualOutput"><div style="font-size:12px;color:var(--ink3)">Run the bot to simulate qualification scoring and lead routing.</div></div>
+      </div>
+      <div class="lg-log-bar" id="qualLogBar"><div class="lg-log-entry">Qualification bot ready · waiting for first response...</div></div>
+    </div>
+
   </div>
 </div>
 
@@ -1500,11 +1531,26 @@ loadScene(0);
 const delay=ms=>new Promise(r=>setTimeout(r,ms));
 function lgFmt(t){return t.replace(/\*(.*?)\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')}
 
+let currentProduct='construction';
 function lgSwitch(which){
   document.getElementById('st-web').classList.toggle('active',which==='web');
   document.getElementById('st-insta').classList.toggle('active',which==='insta');
+  document.getElementById('st-qual').classList.toggle('active',which==='qual');
   document.getElementById('lg-web').classList.toggle('active',which==='web');
   document.getElementById('lg-insta').classList.toggle('active',which==='insta');
+  document.getElementById('lg-qual').classList.toggle('active',which==='qual');
+}
+function setProduct(type){
+  currentProduct=type;
+  document.getElementById('prod-construction').classList.toggle('active',type==='construction');
+  document.getElementById('prod-interior').classList.toggle('active',type==='interior');
+  const construction=type==='construction';
+  document.getElementById('productTagline').textContent=construction?'prospect to site visit, automatically':'prospect to design consultation, automatically';
+  document.querySelector('.lt-url-txt').textContent=construction?'rajeshconstructions.in':'studioaura-interiors.in';
+  document.querySelector('.site-logo-sm').textContent=construction?'Rajesh Constructions':'Studio Aura Interiors';
+  document.querySelector('.site-hero-sm h2').innerHTML=construction?'Build Your Dream Home<br>in Bangalore':'Design Your Dream Home<br>with Premium Interiors';
+  document.querySelector('.site-hero-sm p').textContent=construction?'Premium G+2 construction. Transparent pricing since 2009.':'Modular kitchens, wardrobes, and turnkey interiors with fixed pricing.';
+  document.getElementById('igCtaBtn').textContent=construction?'💬 Free Estimate on WhatsApp':'💬 Free Interior Quote';
 }
 
 /* ── SCENARIO 1: WEBSITE ─────────────────────────── */
@@ -1550,13 +1596,19 @@ async function runWeb(){
   await delay(600); webLog('success','✓ 3D render ready · PDF compiled');
   wcT(false);
 
-  wcM('in','✨ Done! Here\'s your personalised result:\n\n*G+2 on 30×40 = ₹1.2Cr – ₹1.4Cr*\n\nYour full PDF report is ready 👇');
+  wcM('in',currentProduct==='construction'?'✨ Done! Here\'s your personalised result:\n\n*G+2 on 30×40 = ₹1.2Cr – ₹1.4Cr*\n\nYour full PDF report is ready 👇':'✨ Done! Here\'s your personalised result:\n\n*2BHK Interiors = ₹12L – ₹17L*\n\nYour full PDF report is ready 👇');
   await delay(500);
   showWebPDF();
   await delay(700);
-  wcM('in','Would you like a *free site visit* with our chief engineer?');
+  wcM('out',currentProduct==='construction'?'Can you also share floor plan PDF?':'Can you share a sample floor plan and BOQ PDF?');
+  await delay(600);
+  wcM('in','Sure — sharing floor plan PDF now.');
+  await delay(300);
+  showFloorPlanPDF();
+  await delay(700);
+  wcM('in',currentProduct==='construction'?'Would you like a *free site visit* with our chief engineer?':'Would you like a *free design consultation* with our interior designer?');
   await delay(1800);
-  wcM('out','Yes! This weekend works.');
+  wcM('out',currentProduct==='construction'?'Yes! This weekend works.':'Yes, Sunday afternoon works.');
   await delay(700);
   webLog('success','✓ SITE_VISIT_REQUESTED · booking confirmed');
   wcT(true); await delay(1100); wcT(false);
@@ -1616,7 +1668,23 @@ function showWebPDF(){
       <div class="cost-row"><span class="cost-row-label">Wood interiors</span><span class="cost-row-val">₹18,80,000</span></div>
       <div class="cost-total"><span class="cost-total-label">Total Estimate</span><span class="cost-total-val">₹1.2–1.4 Cr</span></div>
     </div>
-    <div class="cost-dl">⬇ Download PDF Report</div>
+    <a class="cost-dl" href="assets/construction-cost-sheet.pdf" download>⬇ Download Cost Sheet PDF</a><a class="cost-dl" href="assets/floor-plan.pdf" download style="margin-top:6px">⬇ Download Floor Plan PDF</a>
+  `;
+  out.appendChild(c);requestAnimationFrame(()=>c.classList.add('show'));
+}
+
+
+function showFloorPlanPDF(){
+  const out=document.getElementById('webOutput');
+  const c=document.createElement('div');c.className='out-card';
+  c.innerHTML=`
+    <div class="cost-head"><div class="cost-head-title">📐 Floor Plan PDF</div><div class="cost-head-sub">Auto-shared when customer asks</div></div>
+    <div class="cost-body">
+      <div class="cost-row"><span class="cost-row-label">File name</span><span class="cost-row-val">floor-plan.pdf</span></div>
+      <div class="cost-row"><span class="cost-row-label">Contains</span><span class="cost-row-val">Ground + First layout</span></div>
+      <div class="cost-row"><span class="cost-row-label">Size</span><span class="cost-row-val">~120 KB</span></div>
+    </div>
+    <a class="cost-dl" href="assets/floor-plan.pdf" download>⬇ Download Floor Plan PDF</a>
   `;
   out.appendChild(c);requestAnimationFrame(()=>c.classList.add('show'));
 }
@@ -1682,9 +1750,13 @@ async function runInsta(){
 
   waRender2();
   await delay(400);
-  waM2('in','Here\'s your personalised result! 🎉\n\n*G+2 on 30×40 HSR Layout*\n💰 *₹1.15Cr – ₹1.35Cr* (premium finish)\n\nWant to book a *free site visit*?');
+  waM2('in',currentProduct==='construction'?'Here\'s your personalised result! 🎉\n\n*G+2 on 30×40 HSR Layout*\n💰 *₹1.15Cr – ₹1.35Cr* (premium finish)\n\nWant to book a *free site visit*?':'Here\'s your interior quote! 🎉\n\n*3BHK interiors for 1650 sq ft*\n💰 *₹14L – ₹19L* (premium finish)\n\nWant to book a *free design consultation*?');
 
   await delay(400); showInstaOutputs();
+  await delay(400);
+  waM2('out','Please share detailed cost sheet PDF and sample floor plan.');
+  await delay(400);
+  waM2('in','Done ✅ Sharing both PDFs now in this chat.');
   await delay(1900);
   waM2('out','Yes! Saturday morning works for me.');
   instaLog('success','✓ SITE_VISIT_REQUESTED · Saturday slot confirmed');
@@ -1769,6 +1841,8 @@ function showInstaOutputs(){
         <div class="cost-row"><span class="cost-row-label">Interiors & Wood</span><span class="cost-row-val">₹16L</span></div>
         <div class="cost-total"><span class="cost-total-label">Total</span><span class="cost-total-val">₹1.15–1.35Cr</span></div>
       </div>
+      <a class="cost-dl" href="assets/construction-cost-sheet.pdf" download>⬇ Cost Sheet PDF</a>
+      <a class="cost-dl" href="assets/floor-plan.pdf" download style="margin-top:6px">⬇ Floor Plan PDF</a>
     `;
     out.appendChild(c);requestAnimationFrame(()=>c.classList.add('show'));
   },500);
@@ -1788,6 +1862,30 @@ function showInstaBooking(){
   `;
   out.appendChild(c);requestAnimationFrame(()=>c.classList.add('show'));
 }
+
+
+async function runQualifier(){
+  const out=document.getElementById('qualOutput');
+  const btn=document.getElementById('playQualBtn');
+  btn.disabled=true;btn.textContent='⏳';
+  out.innerHTML='<div class="qual-row">Collecting responses from lead...</div>';
+  qualLog('Question set sent: budget + timeline + location');
+  await delay(900);
+  qualLog('✓ Lead replied: budget confirmed + timeline 45 days');
+  out.innerHTML=`<div class="qual-row"><strong>Lead Score:</strong> 91/100 (HOT)</div>
+  <div class="qual-row"><strong>Segment:</strong> ${currentProduct==='construction'?'New home construction':'Interior renovation'}</div>
+  <div class="qual-row"><strong>Budget Band:</strong> ${currentProduct==='construction'?'₹1Cr+':'₹12L+'}</div>
+  <div class="qual-row"><strong>Action:</strong> Auto-assigned to sales rep + WhatsApp follow-up in 10 mins.</div>`;
+  qualLog('✓ CRM updated · task created · callback queued');
+  btn.disabled=false;btn.textContent='↺ Replay';
+}
+function qualLog(msg){
+  const el=document.getElementById('qualLogBar');
+  const ok=msg.includes('✓');
+  el.innerHTML=`<div class="lg-log-entry ${ok?'success':''}">${msg}</div>`;
+}
+setProduct('construction');
+
 </script>
 </body>
 </html>
