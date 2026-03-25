@@ -1575,12 +1575,12 @@ const productContent={
     heroTitle:'Own Your Dream Appartment<br>in Bangalore',
     heroDesc:'2BHK and 3BHK premium appartments with flexible payment plans.',
     igCta:'💬 Free Appartment Quote',
-    webResult:'🎉 Appartment options ready!\n\n*3BHK Appartment = ₹82L – ₹96L*\n\nI\'ve bundled options and costing in a PDF set 👇',
+    webResult:'🎉 Appartment options ready!\n\n*3BHK Appartment (1650 sq ft, East-facing) = ₹82L – ₹96L*\n\nI\'ve bundled options and costing in a PDF set 👇',
     webAskPdf:'Can you also share the floor wise appartment layout PDF?',
     webConsultPrompt:'Want me to lock a *free appartment walkthrough* this weekend?',
     webQuickReplies:['Book walkthrough', 'Share tower plan first', 'Need callback'],
     webBookingReply:'Yes, I can visit this weekend.',
-    instaResult:'Here are your appartment options! 🎉\n\n*3BHK Appartment in HSR*\n💰 *₹82L – ₹96L* (all-inclusive)\n\nWant to book a *free site walkthrough*?',
+    instaResult:'Here are your appartment options! 🎉\n\n*3BHK Appartment in HSR (1650 sq ft, East-facing)*\n💰 *₹82L – ₹96L* (all-inclusive)\n\nWant to book a *free site walkthrough*?',
     qualSegment:'Appartment purchase',
     qualBudget:'₹80L+'
   }
@@ -1629,21 +1629,50 @@ async function runWeb(){
   await delay(500);
 
   wcT(true); await delay(1400); wcT(false);
-  wcM('in','👋 Hey there! I\'m *BuildBot AI* — your on-call design wingman.\n\nI can craft a *3D concept + smart cost sheet* in under 2 minutes.\n\nWhat\'s your plot size?');
-  webQuickReplies(['30×40', '40×60', 'Need help choosing']);
+  if(currentProduct==='appartment'){
+    wcM('in','👋 Hey there! I\'m *BuildBot AI* for apartment discovery.\n\nI can shortlist matching options in under 2 minutes.\n\nLike popular online property chats, I\'ll quickly confirm size, facing, design, and block count.\n\nFirst, what apartment size are you looking for (sq ft + BHK)?');
+    webQuickReplies(['1200 sq ft · 2BHK', '1650 sq ft · 3BHK', 'Need help choosing']);
+  }else{
+    wcM('in','👋 Hey there! I\'m *BuildBot AI* — your on-call design wingman.\n\nI can craft a *3D concept + smart cost sheet* in under 2 minutes.\n\nWhat\'s your plot size?');
+    webQuickReplies(['30×40', '40×60', 'Need help choosing']);
+  }
   webLog('Bot greeted visitor');
   await delay(2000);
 
-  wcM('out','30x40, East facing in Indiranagar');
-  webLog('Input: plot=30x40 facing=East location=Indiranagar');
+  if(currentProduct==='appartment'){
+    wcM('out','Looking for 1650 sq ft, 3BHK in HSR Layout.');
+    webLog('Input: size=1650sqft bhk=3 location=HSR_Layout');
+  }else{
+    wcM('out','30x40, East facing in Indiranagar');
+    webLog('Input: plot=30x40 facing=East location=Indiranagar');
+  }
   await delay(900);
   wcT(true); await delay(1300); wcT(false);
-  wcM('in','Love it — East-facing 30×40 gives us beautiful daylight and a strong vastu-friendly entry. ✨\n\nPick your style vibe:');
-  webQuickReplies(['Modern Contemporary', 'Traditional', 'Minimalist + Warm Wood']);
-  await delay(1900);
-
-  wcM('out','Modern contemporary, big windows, wood finish');
-  webLog('Style: MODERN_CONTEMPORARY + LARGE_WINDOWS + WOOD_FINISH');
+  if(currentProduct==='appartment'){
+    wcM('in','Great pick. Do you have a *facing preference* for your unit?');
+    webQuickReplies(['East-facing', 'North-facing', 'No preference']);
+    await delay(1400);
+    wcM('out','East-facing preferred.');
+    await delay(700);
+    wcM('in','Perfect. Which *apartment design style* do you prefer?');
+    webQuickReplies(['Modern', 'Contemporary + Wood', 'Minimalist']);
+    await delay(1400);
+    wcM('out','Contemporary + Wood.');
+    await delay(700);
+    wcM('in','Got it. Last filter — do you prefer projects with fewer blocks or larger communities?');
+    webQuickReplies(['2–4 blocks', '5+ blocks', 'No preference']);
+    await delay(1300);
+    wcM('out','Prefer 2–4 blocks.');
+  }else{
+    wcM('in','Love it — East-facing 30×40 gives us beautiful daylight and a strong vastu-friendly entry. ✨\n\nPick your style vibe:');
+    webQuickReplies(['Modern Contemporary', 'Traditional', 'Minimalist + Warm Wood']);
+    await delay(1900);
+    wcM('out','Modern contemporary, big windows, wood finish');
+    webLog('Style: MODERN_CONTEMPORARY + LARGE_WINDOWS + WOOD_FINISH');
+  }
+  if(currentProduct==='appartment'){
+    webLog('Filters: facing=EAST design=CONTEMP_WOOD blocks=2_to_4');
+  }
   await delay(700);
   webLog('warn','→ Calling Gemini Estimator API...');
   wcT(true);
@@ -1795,17 +1824,32 @@ async function runInsta(){
 
   waT2(true); instaLog('success','✓ WhatsApp session opened · bot triggered');
   await delay(1700); waT2(false);
-  waM2('in','👋 Hi! Great to see you here. I\'m BuildBot AI from Rajesh Constructions.\n\nShare your plot details and I\'ll instantly create a *3D concept + premium cost sheet PDF*.\n\nWhat\'s your plot size?');
+  if(currentProduct==='appartment'){
+    waM2('in','👋 Hi! I\'m BuildBot AI from Aura Appartments.\n\nI can match apartment options quickly.\n\nLike common property assistant chats, I\'ll ask size, facing, design, and number of blocks.\n\nTell me your preferred apartment size (sq ft + BHK).');
+  }else{
+    waM2('in','👋 Hi! Great to see you here. I\'m BuildBot AI from Rajesh Constructions.\n\nShare your plot details and I\'ll instantly create a *3D concept + premium cost sheet PDF*.\n\nWhat\'s your plot size?');
+  }
 
   await delay(2200);
-  waM2('out','30x40 plot, East facing, HSR Layout');
-  instaLog('Lead: plot=30x40 facing=East location=HSR_Layout');
+  if(currentProduct==='appartment'){
+    waM2('out','3BHK around 1650 sq ft in HSR Layout.');
+    instaLog('Lead: type=APPARTMENT bhk=3 size=1650 location=HSR_Layout');
+  }else{
+    waM2('out','30x40 plot, East facing, HSR Layout');
+    instaLog('Lead: plot=30x40 facing=East location=HSR_Layout');
+  }
   await delay(800);
   waT2(true); await delay(1300); waT2(false);
-  waM2('in','HSR Layout is one of our most active areas!\n\nWhat style do you prefer?\n• Modern Contemporary\n• Traditional / Vastu\n• Minimalist');
-  await delay(2000);
-
-  waM2('out','Modern contemporary. Clean lines, big windows.');
+  if(currentProduct==='appartment'){
+    waM2('in','Perfect. What do you prefer?\n• Unit facing: East / North / No preference\n• Design: Modern / Contemporary / Minimalist\n• Project size: 2–4 blocks / 5+ blocks');
+    await delay(1600);
+    waM2('out','East facing, contemporary design, 2–4 blocks.');
+    instaLog('Filters: facing=EAST design=CONTEMPORARY blocks=2_to_4');
+  }else{
+    waM2('in','HSR Layout is one of our most active areas!\n\nWhat style do you prefer?\n• Modern Contemporary\n• Traditional / Vastu\n• Minimalist');
+    await delay(2000);
+    waM2('out','Modern contemporary. Clean lines, big windows.');
+  }
   instaLog('warn','→ AI pipeline: Gemini Estimator + Stable Diffusion...');
   await delay(600);
   waT2(true);
