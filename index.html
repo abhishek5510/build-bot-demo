@@ -416,6 +416,8 @@ table.dt{width:100%;border-collapse:collapse}
 .wch-input-bar{background:#fff;border-top:1px solid #e5e7eb;padding:5px 7px;display:flex;gap:5px;flex-shrink:0}
 .wch-inp{flex:1;background:#f3f4f6;border-radius:10px;padding:4px 8px;font-size:8.5px;color:#aaa;border:none;font-family:inherit}
 .wch-send{width:22px;height:22px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;flex-shrink:0}
+.wch-quick{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.wch-chip{font-size:8px;font-weight:600;background:#ecfdf5;color:#166534;border:1px solid #86efac;padding:3px 6px;border-radius:999px}
 
 /* ── INSTAGRAM → WHATSAPP LAYOUT ── */
 .ig-wa-wrap{display:flex;align-items:center;gap:20px;flex-shrink:0}
@@ -1575,7 +1577,8 @@ async function runWeb(){
   await delay(500);
 
   wcT(true); await delay(1400); wcT(false);
-  wcM('in','👋 Welcome! I\'m BuildBot AI.\n\nI can generate a *free 3D concept + cost estimate* for your plot — right now, no signup needed.\n\nWhat\'s your plot size?');
+  wcM('in','👋 Hey there! I\'m *BuildBot AI* — your on-call design wingman.\n\nI can craft a *3D concept + smart cost sheet* in under 2 minutes.\n\nWhat\'s your plot size?');
+  webQuickReplies(['30×40', '40×60', 'Need help choosing']);
   webLog('Bot greeted visitor');
   await delay(2000);
 
@@ -1583,7 +1586,8 @@ async function runWeb(){
   webLog('Input: plot=30x40 facing=East location=Indiranagar');
   await delay(900);
   wcT(true); await delay(1300); wcT(false);
-  wcM('in','Perfect — East-facing 30x40 is ideal for G+2 with great vastu.\n\nWhat style do you prefer?\n• Modern Contemporary\n• Traditional\n• Minimalist');
+  wcM('in','Love it — East-facing 30×40 gives us beautiful daylight and a strong vastu-friendly entry. ✨\n\nPick your style vibe:');
+  webQuickReplies(['Modern Contemporary', 'Traditional', 'Minimalist + Warm Wood']);
   await delay(1900);
 
   wcM('out','Modern contemporary, big windows, wood finish');
@@ -1596,17 +1600,18 @@ async function runWeb(){
   await delay(600); webLog('success','✓ 3D render ready · PDF compiled');
   wcT(false);
 
-  wcM('in',currentProduct==='construction'?'✨ Done! Here\'s your personalised result:\n\n*G+2 on 30×40 = ₹1.2Cr – ₹1.4Cr*\n\nYour full PDF report is ready 👇':'✨ Done! Here\'s your personalised result:\n\n*2BHK Interiors = ₹12L – ₹17L*\n\nYour full PDF report is ready 👇');
+  wcM('in',currentProduct==='construction'?'🎉 Concept locked! Here\'s your personalised result:\n\n*G+2 on 30×40 = ₹1.2Cr – ₹1.4Cr*\n\nI\'ve bundled it into a polished PDF set 👇':'🎉 Design snapshot ready!\n\n*2BHK Interiors = ₹12L – ₹17L*\n\nI\'ve bundled it into a polished PDF set 👇');
   await delay(500);
   showWebPDF();
   await delay(700);
   wcM('out',currentProduct==='construction'?'Can you also share floor plan PDF?':'Can you share a sample floor plan and BOQ PDF?');
   await delay(600);
-  wcM('in','Sure — sharing floor plan PDF now.');
+  wcM('in','Absolutely — sending the styled floor design PDF now.');
   await delay(300);
   showFloorPlanPDF();
   await delay(700);
-  wcM('in',currentProduct==='construction'?'Would you like a *free site visit* with our chief engineer?':'Would you like a *free design consultation* with our interior designer?');
+  wcM('in',currentProduct==='construction'?'Want me to lock a *free site visit* with our chief engineer?':'Want me to lock a *free design consultation* with our interior designer?');
+  webQuickReplies(currentProduct==='construction'?['Book this weekend', 'Show evening slots', 'Need callback first']:['Book consultation', 'Share portfolio first', 'Need callback']);
   await delay(1800);
   wcM('out',currentProduct==='construction'?'Yes! This weekend works.':'Yes, Sunday afternoon works.');
   await delay(700);
@@ -1629,6 +1634,14 @@ function wcM(dir,text){
   d.className='wch-bbl '+(dir==='out'?'wch-out':'wch-in');
   d.innerHTML=lgFmt(text);
   msgs.insertBefore(d,t);scrollWC();
+}
+function webQuickReplies(options){
+  const msgs=document.getElementById('wchMsgs');
+  const t=document.getElementById('wchTyping');
+  const row=document.createElement('div');
+  row.className='wch-quick';
+  row.innerHTML=options.map(o=>`<span class="wch-chip">${o}</span>`).join('');
+  msgs.insertBefore(row,t);scrollWC();
 }
 function scrollWC(){const m=document.getElementById('wchMsgs');setTimeout(()=>m.scrollTop=m.scrollHeight,50);}
 function webLog(msg){
@@ -1730,7 +1743,7 @@ async function runInsta(){
 
   waT2(true); instaLog('success','✓ WhatsApp session opened · bot triggered');
   await delay(1700); waT2(false);
-  waM2('in','👋 Hi! Thanks for your interest in Rajesh Constructions!\n\nI can give you a *free 3D concept + cost estimate* for your plot in 2 minutes.\n\nWhat\'s your plot size?');
+  waM2('in','👋 Hi! Great to see you here. I\'m BuildBot AI from Rajesh Constructions.\n\nShare your plot details and I\'ll instantly create a *3D concept + premium cost sheet PDF*.\n\nWhat\'s your plot size?');
 
   await delay(2200);
   waM2('out','30x40 plot, East facing, HSR Layout');
@@ -1756,7 +1769,7 @@ async function runInsta(){
   await delay(400);
   waM2('out','Please share detailed cost sheet PDF and sample floor plan.');
   await delay(400);
-  waM2('in','Done ✅ Sharing both PDFs now in this chat.');
+  waM2('in','Done ✅ Sending both now — a designer floor plan PDF + a structured cost sheet PDF.');
   await delay(1900);
   waM2('out','Yes! Saturday morning works for me.');
   instaLog('success','✓ SITE_VISIT_REQUESTED · Saturday slot confirmed');
